@@ -2,8 +2,10 @@ package handlers
 
 import (
 	"av-merch-shop/config"
+	"av-merch-shop/internal/infrastructure/middleware"
 	"reflect"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
@@ -29,6 +31,12 @@ func (h *Handlers) RegisterRoutes(r *gin.Engine) { //, jwtService *auth.JWTServi
 
 	registerRoutes := func(groups ...*gin.RouterGroup) {
 		for _, g := range groups {
+			g.Use(
+				middleware.TimeoutMiddleware(
+					time.Duration(h.config.Server.RequestTimeout) * time.Millisecond,
+				),
+			)
+
 			g.GET("/ping", GetPingHandler)
 			g.GET("/teapot", GetTeapotHandler)
 			g.GET("/sleep", GetSleepHandler)

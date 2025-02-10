@@ -11,6 +11,7 @@ import (
 type Config struct {
 	Logger *slog.Logger
 	Server ServerConfig
+	Auth   AuthConfig
 }
 
 func Load() *Config {
@@ -28,7 +29,7 @@ func (c *Config) load() {
 	}
 
 	// c.loadDBConfig()
-	// c.loadAuthConfig()
+	c.loadAuthConfig()
 	c.loadServerConfig()
 }
 

@@ -3,6 +3,7 @@ package handlers
 import (
 	"av-merch-shop/config"
 	"av-merch-shop/internal/infrastructure/middleware"
+	"av-merch-shop/pkg/auth"
 	"reflect"
 	"strings"
 	"time"
@@ -22,7 +23,7 @@ func NewHandlers(cfg *config.Config) *Handlers {
 	}
 }
 
-func (h *Handlers) RegisterRoutes(r *gin.Engine) { //, jwtService *auth.JWTService) {
+func (h *Handlers) RegisterRoutes(r *gin.Engine, jwtService *auth.JWTService) {
 
 	h.configureFieldValidator()
 
@@ -40,6 +41,14 @@ func (h *Handlers) RegisterRoutes(r *gin.Engine) { //, jwtService *auth.JWTServi
 			g.GET("/ping", GetPingHandler)
 			g.GET("/teapot", GetTeapotHandler)
 			g.GET("/sleep", GetSleepHandler)
+
+			protected := g.Group("")
+			protected.Use(middleware.AuthMiddleware(jwtService))
+
+			{
+				// put protected routes here
+			}
+
 		}
 	}
 

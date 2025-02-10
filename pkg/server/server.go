@@ -3,9 +3,8 @@ package server
 import (
 	"av-merch-shop/config"
 	"av-merch-shop/internal/handlers"
+	"av-merch-shop/pkg/auth"
 
-	// "av-merch-shop/internal/handlers"
-	// "av-merch-shop/pkg/auth"
 	"context"
 	"fmt"
 	"net/http"
@@ -25,7 +24,7 @@ type Server struct {
 
 func New(cfg *config.Config, handlers *handlers.Handlers) *Server {
 	router := gin.Default()
-	// jwtService := auth.NewJWTService(cfg)
+	jwtService := auth.NewJWTService(cfg)
 
 	config := cors.DefaultConfig()
 	config.AllowOrigins = []string{
@@ -34,7 +33,7 @@ func New(cfg *config.Config, handlers *handlers.Handlers) *Server {
 	config.AllowHeaders = []string{"Origin", "Content-Length", "Content-Type", "User-Agent"}
 
 	router.Use(cors.New(config))
-	handlers.RegisterRoutes(router) //, jwtService)
+	handlers.RegisterRoutes(router, jwtService)
 
 	return &Server{
 		httpServer: &http.Server{

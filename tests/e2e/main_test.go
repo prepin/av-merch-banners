@@ -1,6 +1,7 @@
 package e2e
 
 import (
+	"av-merch-shop/tests/setup"
 	"os"
 	"testing"
 
@@ -15,12 +16,12 @@ func TestMain(m *testing.M) {
 
 type E2ETestSuite struct {
 	suite.Suite
-	env     *TestEnv
+	env     *setup.TestEnv
 	cleanup func()
 	client  *resty.Client
 }
 
-var bannerUrl = "/v1/banner"
+var authUrl = "/api/v1/auth"
 
 type bannerItem struct {
 	ID        int    `json:"id"`
@@ -30,16 +31,12 @@ type bannerItem struct {
 	IsActive  bool   `json:"is_active"`
 }
 
-type bannerCreatedResponse struct {
-	BannerId int `json:"banner_id"`
-}
-
 type errorResponse struct {
 	Error string `json:"error"`
 }
 
 func (s *E2ETestSuite) SetupTest() {
-	s.env, s.cleanup = setupTestEnv(s.T())
+	s.env, s.cleanup = setup.SetupTestEnv(s.T())
 	s.client = resty.New()
 }
 

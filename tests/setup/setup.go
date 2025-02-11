@@ -1,11 +1,11 @@
-package e2e
+package setup
 
 import (
 	"av-merch-shop/config"
 	"av-merch-shop/internal/app"
 	"av-merch-shop/pkg/auth"
 	"av-merch-shop/pkg/database"
-	"av-merch-shop/tests/e2e/testdb"
+	"av-merch-shop/tests/testdb"
 	"log/slog"
 	"net/http"
 	"net/http/httptest"
@@ -24,7 +24,7 @@ type TestEnv struct {
 	JWT        *auth.JWTService
 }
 
-func setupTestEnv(t *testing.T) (*TestEnv, func()) {
+func SetupTestEnv(t *testing.T) (*TestEnv, func()) {
 	t.Helper()
 
 	// Initialize test database

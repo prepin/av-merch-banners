@@ -18,7 +18,7 @@ func (td *TestDatabase) LoadFixtures() error {
 
 	_, filename, _, _ := runtime.Caller(0)
 	currentDir := filepath.Dir(filename)
-	seedsPath := filepath.Join(currentDir, "..", "..", "..", "schema", "seed")
+	seedsPath := filepath.Join(currentDir, "..", "..", "schema", "seed")
 
 	absPath, err := filepath.Abs(seedsPath)
 	if err != nil {

@@ -13,7 +13,7 @@ import (
 func (td *TestDatabase) RunMigrations() error {
 	_, filename, _, _ := runtime.Caller(0)
 	currentDir := filepath.Dir(filename)
-	migrationsPath := filepath.Join(currentDir, "..", "..", "..", "schema", "migrations")
+	migrationsPath := filepath.Join(currentDir, "..", "..", "schema", "migrations")
 
 	absPath, err := filepath.Abs(migrationsPath)
 	if err != nil {

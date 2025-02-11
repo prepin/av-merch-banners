@@ -20,6 +20,7 @@ func New(cfg *config.Config, db *database.Database) *Application {
 
 	services := usecase.Services{
 		TokenService: auth.NewJWTService(cfg),
+		HashService:  auth.NewBCryptHashService(),
 	}
 
 	usecases := usecase.NewUsecases(repos, services)

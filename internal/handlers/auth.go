@@ -40,7 +40,7 @@ func (h *AuthHandler) PostAuth(c *gin.Context) {
 		return
 	}
 
-	token, err := h.usecase.SignIn(params.Username, params.Password)
+	token, err := h.usecase.SignIn(c.Request.Context(), params.Username, params.Password)
 	if err != nil {
 		if errors.Is(err, errs.ErrNoAccess{}) {
 			c.JSON(http.StatusUnauthorized, ErrorResponse{Error: "wrong password"})

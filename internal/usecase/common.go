@@ -6,6 +6,6 @@ type Usecases struct {
 
 func NewUsecases(r Repos, s Services) Usecases {
 	return Usecases{
-		AuthUseCase: NewAuthUsecase(r.UserRepo, s.TokenService),
+		AuthUseCase: NewAuthUsecase(r.UserRepo, s.TokenService, s.HashService),
 	}
 }

@@ -6,7 +6,6 @@ import (
 	"av-merch-shop/pkg/database"
 	"context"
 	"errors"
-	"fmt"
 	"log/slog"
 
 	"github.com/jackc/pgx/v5"
@@ -30,12 +29,11 @@ func (u *PGUserRepo) GetByUsername(ctx context.Context, username string) (*entit
 
 	stmt := psql.Select(
 		sm.From("users"),
-		sm.Where(psql.Raw("username").EQ(psql.Arg(username))),
+		sm.Where(psql.Quote("username").EQ(psql.Arg(username))),
 		sm.Limit(1),
 	)
 
 	query, args := stmt.MustBuild(ctx)
-	fmt.Println(query, args)
 
 	row, _ := u.db.Pool.Query(ctx, query, args...)
 	user, err := pgx.CollectOneRow(row, pgx.RowToStructByName[entities.User])
@@ -63,7 +61,6 @@ func (u *PGUserRepo) Create(ctx context.Context, data entities.UserData) (*entit
 	)
 
 	query, args := stmt.MustBuild(ctx)
-	fmt.Println(query, args)
 	row, _ := u.db.Pool.Query(ctx, query, args...)
 	user, err := pgx.CollectOneRow(row, pgx.RowToStructByName[entities.User])
 

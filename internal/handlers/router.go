@@ -3,10 +3,10 @@ package handlers
 import (
 	"av-merch-shop/config"
 	"av-merch-shop/internal/infrastructure/middleware"
+	"av-merch-shop/internal/usecase"
 	"av-merch-shop/pkg/auth"
 	"reflect"
 	"strings"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
@@ -15,11 +15,13 @@ import (
 
 type Handlers struct {
 	config *config.Config
+	Auth   *AuthHandler
 }
 
-func NewHandlers(cfg *config.Config) *Handlers {
+func NewHandlers(cfg *config.Config, usecases usecase.Usecases) *Handlers {
 	return &Handlers{
 		config: cfg,
+		Auth:   NewAuthHandler(cfg.Logger, usecases.AuthUseCase),
 	}
 }
 
@@ -32,15 +34,21 @@ func (h *Handlers) RegisterRoutes(r *gin.Engine, jwtService *auth.JWTService) {
 
 	registerRoutes := func(groups ...*gin.RouterGroup) {
 		for _, g := range groups {
-			g.Use(
-				middleware.TimeoutMiddleware(
-					time.Duration(h.config.Server.RequestTimeout) * time.Millisecond,
-				),
-			)
+			// g.Use(
+			// 	middleware.TimeoutMiddleware(
+			// 		time.Duration(h.config.Server.RequestTimeout) * time.Millisecond,
+			// 	),
+			// )
 
-			g.GET("/ping", GetPingHandler)
-			g.GET("/teapot", GetTeapotHandler)
-			g.GET("/sleep", GetSleepHandler)
+			// healthcheck эндпойнты
+			{
+				g.GET("/ping", GetPingHandler)
+				g.GET("/teapot", GetTeapotHandler)
+				g.GET("/sleep", GetSleepHandler)
+			}
+
+			// авторизация (и автосоздание юзера)
+			g.POST("/auth", h.Auth.PostAuth)
 
 			protected := g.Group("")
 			protected.Use(middleware.AuthMiddleware(jwtService))

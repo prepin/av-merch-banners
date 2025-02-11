@@ -12,6 +12,7 @@ type Config struct {
 	Logger *slog.Logger
 	Server ServerConfig
 	Auth   AuthConfig
+	DB     DBConfig
 }
 
 func Load() *Config {
@@ -28,7 +29,7 @@ func (c *Config) load() {
 		c.Logger.Warn("Warning: .env file not found or error loading:", "error", err)
 	}
 
-	// c.loadDBConfig()
+	c.loadDBConfig()
 	c.loadAuthConfig()
 	c.loadServerConfig()
 }

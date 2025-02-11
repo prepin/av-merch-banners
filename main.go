@@ -3,13 +3,17 @@ package main
 import (
 	"av-merch-shop/config"
 	"av-merch-shop/internal/app"
+	"av-merch-shop/pkg/database"
 	"av-merch-shop/pkg/server"
 	"log/slog"
 )
 
 func main() {
 	cfg := config.Load()
-	app := app.New(cfg)
+	db := database.NewDatabase(cfg.DB)
+	defer db.Close()
+
+	app := app.New(cfg, db)
 
 	cfg.Logger.Info("Launching Merch Shop", "config", cfg.Server)
 

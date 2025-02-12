@@ -32,6 +32,8 @@ func NewAuthHandler(l *slog.Logger, uc *usecase.AuthUseCase) *AuthHandler {
 	return handler
 }
 
+// Возвращает токен если пользователя не существует (тогда он будет создан), или если
+// логин и пароль корректны.
 func (h *AuthHandler) PostAuth(c *gin.Context) {
 	var params *AuthPostParams
 	if err := c.ShouldBindJSON(&params); err != nil {

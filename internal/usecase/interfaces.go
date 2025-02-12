@@ -6,7 +6,8 @@ import (
 )
 
 type Repos struct {
-	UserRepo UserRepo
+	UserRepo        UserRepo
+	TransactionRepo TransactionRepo
 }
 
 type Services struct {
@@ -17,6 +18,11 @@ type Services struct {
 type UserRepo interface {
 	GetByUsername(ctx context.Context, username string) (*entities.User, error)
 	Create(ctx context.Context, data entities.UserData) (*entities.User, error)
+}
+
+type TransactionRepo interface {
+	GetUserBalance(ctx context.Context, userId int) (int, error)
+	CreateTransaction(ctx context.Context, data entities.TransactionData) (*entities.Transaction, error)
 }
 
 type TokenService interface {

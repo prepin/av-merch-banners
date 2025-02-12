@@ -16,12 +16,14 @@ import (
 type Handlers struct {
 	config *config.Config
 	Auth   *AuthHandler
+	Credit *CreditHandler
 }
 
 func NewHandlers(cfg *config.Config, usecases usecase.Usecases) *Handlers {
 	return &Handlers{
 		config: cfg,
 		Auth:   NewAuthHandler(cfg.Logger, usecases.AuthUseCase),
+		Credit: NewCreditHandler(cfg.Logger, usecases.CreditUseCase),
 	}
 }
 
@@ -55,6 +57,11 @@ func (h *Handlers) RegisterRoutes(r *gin.Engine, jwtService *auth.JWTService) {
 
 			{
 				// put protected routes here
+				admin := protected.Group("")
+				admin.Use(middleware.AdminOnly())
+				{
+					admin.POST("/credit", h.Credit.PostCredit)
+				}
 			}
 
 		}

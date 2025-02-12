@@ -19,13 +19,14 @@ type PGUserRepo struct {
 	logger *slog.Logger
 }
 
-func NewPGUserRepo(db *database.Database) *PGUserRepo {
+func NewPGUserRepo(db *database.Database, logger *slog.Logger) *PGUserRepo {
 	return &PGUserRepo{
-		db: db,
+		db:     db,
+		logger: logger,
 	}
 }
 
-func (u *PGUserRepo) GetByUsername(ctx context.Context, username string) (*entities.User, error) {
+func (r *PGUserRepo) GetByUsername(ctx context.Context, username string) (*entities.User, error) {
 
 	stmt := psql.Select(
 		sm.From("users"),
@@ -35,21 +36,21 @@ func (u *PGUserRepo) GetByUsername(ctx context.Context, username string) (*entit
 
 	query, args := stmt.MustBuild(ctx)
 
-	row, _ := u.db.Pool.Query(ctx, query, args...)
+	row, _ := r.db.Pool.Query(ctx, query, args...)
 	user, err := pgx.CollectOneRow(row, pgx.RowToStructByName[entities.User])
 
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, errs.ErrNotFound{Err: err}
 		}
-		u.logger.Error("Failed query user", "error", errs.ErrInternal{Err: err})
+		r.logger.Error("Failed query user", "error", errs.ErrInternal{Err: err})
 		return nil, err
 	}
 
 	return &user, nil
 }
 
-func (u *PGUserRepo) Create(ctx context.Context, data entities.UserData) (*entities.User, error) {
+func (r *PGUserRepo) Create(ctx context.Context, data entities.UserData) (*entities.User, error) {
 	stmt := psql.Insert(
 		im.Into("users", "username", "hashed_password", "role"),
 		im.Values(
@@ -61,14 +62,14 @@ func (u *PGUserRepo) Create(ctx context.Context, data entities.UserData) (*entit
 	)
 
 	query, args := stmt.MustBuild(ctx)
-	row, _ := u.db.Pool.Query(ctx, query, args...)
+	row, _ := r.db.Pool.Query(ctx, query, args...)
 	user, err := pgx.CollectOneRow(row, pgx.RowToStructByName[entities.User])
 
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, errs.ErrNotFound{Err: err}
 		}
-		u.logger.Error("Failed query user", "error", errs.ErrInternal{Err: err})
+		r.logger.Error("Failed query user", "error", errs.ErrInternal{Err: err})
 		return nil, err
 	}
 

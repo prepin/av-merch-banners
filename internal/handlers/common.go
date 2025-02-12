@@ -5,7 +5,7 @@ import (
 )
 
 type ErrorResponse struct {
-	Error string `json:"error"`
+	Error string `json:"errors"`
 }
 
 var NotFoundResponse = ErrorResponse{Error: "not found"}

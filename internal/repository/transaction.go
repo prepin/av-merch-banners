@@ -5,7 +5,6 @@ import (
 	"av-merch-shop/pkg/database"
 	"context"
 	"database/sql"
-	"fmt"
 	"log/slog"
 
 	"github.com/jackc/pgx/v5"
@@ -37,7 +36,7 @@ func (r *PGTransactionRepo) GetUserBalance(ctx context.Context, userId int) (int
 	query, args := stmt.MustBuild(ctx)
 
 	var balance int
-	err := r.db.Pool.QueryRow(ctx, query, args...).Scan(&balance)
+	err := r.db.Conn(ctx).QueryRow(ctx, query, args...).Scan(&balance)
 
 	if err != nil {
 		r.logger.Error("Failed query user balance", "error", err)
@@ -73,9 +72,8 @@ func (r *PGTransactionRepo) CreateTransaction(ctx context.Context, data entities
 	)
 
 	query, args := stmt.MustBuild(ctx)
-	fmt.Println(query, args)
 
-	row, _ := r.db.Pool.Query(ctx, query, args...)
+	row, _ := r.db.Conn(ctx).Query(ctx, query, args...)
 
 	// тут пришлось заморочиться с конверсией NULL поля
 	transaction, err := pgx.CollectOneRow(row, func(row pgx.CollectableRow) (entities.Transaction, error) {

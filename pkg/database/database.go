@@ -6,11 +6,17 @@ import (
 	"log"
 	"time"
 
+	trmpgx "github.com/avito-tech/go-transaction-manager/drivers/pgxv5/v2"
+	"github.com/avito-tech/go-transaction-manager/trm/v2/manager"
+	"github.com/avito-tech/go-transaction-manager/trm/v2/settings"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type Database struct {
-	Pool *pgxpool.Pool
+	TransactionManager *manager.Manager
+	pool               *pgxpool.Pool
+	getter             *trmpgx.CtxGetter
 }
 
 func NewDatabase(cfg config.DBConfig) *Database {
@@ -38,11 +44,29 @@ func NewDatabase(cfg config.DBConfig) *Database {
 		return nil
 	}
 
+	trManager := manager.Must(
+		trmpgx.NewDefaultFactory(pool),
+		manager.WithSettings(
+			trmpgx.MustSettings(
+				settings.Must(),
+				trmpgx.WithTxOptions(pgx.TxOptions{
+					IsoLevel: pgx.RepeatableRead,
+				}),
+			),
+		),
+	)
+
 	return &Database{
-		Pool: pool,
+		TransactionManager: trManager,
+		pool:               pool,
+		getter:             trmpgx.DefaultCtxGetter,
 	}
 }
 
+func (d *Database) Conn(ctx context.Context) trmpgx.Tr {
+	return d.getter.DefaultTrOrDB(ctx, d.pool)
+}
+
 func (d *Database) Close() {
-	d.Pool.Close()
+	d.pool.Close()
 }

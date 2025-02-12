@@ -6,13 +6,18 @@ import (
 )
 
 type Repos struct {
-	UserRepo        UserRepo
-	TransactionRepo TransactionRepo
+	TransactionManager TransactionManager
+	UserRepo           UserRepo
+	TransactionRepo    TransactionRepo
 }
 
 type Services struct {
 	TokenService TokenService
 	HashService  HashService
+}
+
+type TransactionManager interface {
+	Do(ctx context.Context, f func(ctx context.Context) error) error
 }
 
 type UserRepo interface {

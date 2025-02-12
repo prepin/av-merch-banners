@@ -15,8 +15,9 @@ type Application struct {
 
 func New(cfg *config.Config, db *database.Database) *Application {
 	repos := usecase.Repos{
-		UserRepo:        repository.NewPGUserRepo(db, cfg.Logger),
-		TransactionRepo: repository.NewPGTransactionRepo(db, cfg.Logger),
+		TransactionManager: db.TransactionManager,
+		UserRepo:           repository.NewPGUserRepo(db, cfg.Logger),
+		TransactionRepo:    repository.NewPGTransactionRepo(db, cfg.Logger),
 	}
 
 	services := usecase.Services{

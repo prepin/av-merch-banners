@@ -1,8 +1,6 @@
 package handlers
 
 import (
-	"fmt"
-
 	"github.com/go-playground/validator/v10"
 )
 
@@ -15,7 +13,6 @@ var InvalidRequestResponse = ErrorResponse{Error: "invalid request"}
 var ServerErrorResponse = ErrorResponse{Error: "server error"}
 
 func formatValidationError(err error) string {
-	fmt.Println(err)
 	if validationErrors, ok := err.(validator.ValidationErrors); ok {
 		for _, e := range validationErrors {
 			field := e.Field()

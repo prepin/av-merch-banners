@@ -36,7 +36,7 @@ func (r *PGUserRepo) GetByUsername(ctx context.Context, username string) (*entit
 
 	query, args := stmt.MustBuild(ctx)
 
-	row, _ := r.db.Pool.Query(ctx, query, args...)
+	row, _ := r.db.Conn(ctx).Query(ctx, query, args...)
 	user, err := pgx.CollectOneRow(row, pgx.RowToStructByName[entities.User])
 
 	if err != nil {
@@ -62,7 +62,7 @@ func (r *PGUserRepo) Create(ctx context.Context, data entities.UserData) (*entit
 	)
 
 	query, args := stmt.MustBuild(ctx)
-	row, _ := r.db.Pool.Query(ctx, query, args...)
+	row, _ := r.db.Conn(ctx).Query(ctx, query, args...)
 	user, err := pgx.CollectOneRow(row, pgx.RowToStructByName[entities.User])
 
 	if err != nil {

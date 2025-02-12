@@ -19,7 +19,6 @@ func (s *E2ETestSuite) TestCreditPost() {
 	s.Require().Equal(http.StatusOK, resp.StatusCode(), "Failed to get auth token")
 	directorToken := tokenResponse.Token
 
-	// Get employee token
 	authReq = s.client.R().
 		SetBody(AuthRequest{
 			Username: "employee",
@@ -120,6 +119,17 @@ func (s *E2ETestSuite) TestCreditPost() {
 			expectedError:    "admin access required",
 			isSuccess:        false,
 			useEmployeeToken: true,
+		},
+		{
+			name: "invalid request with missing username",
+			payload: CreditRequest{
+				Username: "",
+				Amount:   100,
+			},
+			expectedCode:  http.StatusBadRequest,
+			expectedError: "username is required",
+			isSuccess:     false,
+			useToken:      true,
 		},
 	}
 

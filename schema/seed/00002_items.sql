@@ -1,5 +1,4 @@
 -- +goose Up
--- +goose StatementBegin
 INSERT INTO
   items (codename, cost)
 VALUES
@@ -14,7 +13,4 @@ VALUES
   ('wallet', 50);
 
 -- +goose Down
--- +goose StatementBegin
 DELETE FROM ITEMS;
-
--- +goose StatementEnd

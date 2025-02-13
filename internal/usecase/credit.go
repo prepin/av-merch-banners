@@ -3,6 +3,7 @@ package usecase
 import (
 	"av-merch-shop/internal/entities"
 	"context"
+	"fmt"
 
 	"github.com/google/uuid"
 )
@@ -28,7 +29,7 @@ func (u *CreditUseCase) Credit(
 	*entities.CreditTransactionResult, error) {
 
 	var tr *entities.Transaction
-	var balance int64
+	var balance int
 	var user *entities.User
 
 	err := u.transactionManager.Do(ctx, func(ctx context.Context) error {
@@ -39,17 +40,17 @@ func (u *CreditUseCase) Credit(
 			return err
 		}
 		// проверяем баланс пользователя
-		balanceInt, err := u.transactionRepo.GetUserBalance(ctx, user.ID)
+		balance, err = u.transactionRepo.GetUserBalance(ctx, user.ID)
 		if err != nil {
 			return err
 		}
-		balance = int64(balanceInt)
+		fmt.Println("БАЛАНС", balance, "ИЗМЕНЕНИЕ", data.Amount)
 
 		// если после суммирования баланс отрицательный, то это транзакция списания
-		// и она попытается сделать баланс ниже нуля — меняем размер транзакции
+		// и если она попытается сделать баланс ниже нуля — меняем размер транзакции
 		// на остаток баланса
-		if balance+int64(data.Amount) < 0 {
-			data.Amount = int(-balance)
+		if balance+data.Amount < 0 {
+			data.Amount = -balance
 		}
 
 		// записываем транзакцию в БД
@@ -70,8 +71,9 @@ func (u *CreditUseCase) Credit(
 		return nil, err
 	}
 
+	fmt.Println("БАЛАНС", balance, "ИЗМЕНЕНИЕ", data.Amount)
 	return &entities.CreditTransactionResult{
-		NewAmount:   int(balance + int64(data.Amount)),
+		NewAmount:   balance + data.Amount,
 		ReferenceID: tr.ReferenceId,
 	}, nil
 }

@@ -5,64 +5,116 @@ import (
 	"av-merch-shop/internal/errs"
 	"context"
 	"errors"
+
+	"github.com/google/uuid"
 )
 
 type AuthUseCase struct {
-	userRepo     UserRepo
-	tokenService TokenService
-	hashService  HashService
+	transactionManager TransactionManager
+	userRepo           UserRepo
+	transactionRepo    TransactionRepo
+	tokenService       TokenService
+	hashService        HashService
 }
 
-func NewAuthUsecase(ur UserRepo, ts TokenService, hs HashService) *AuthUseCase {
+func NewAuthUsecase(tm TransactionManager, ur UserRepo, tr TransactionRepo, ts TokenService, hs HashService) *AuthUseCase {
 	return &AuthUseCase{
-		userRepo:     ur,
-		tokenService: ts,
-		hashService:  hs,
+		transactionManager: tm,
+		userRepo:           ur,
+		transactionRepo:    tr,
+		tokenService:       ts,
+		hashService:        hs,
 	}
 }
 
 func (u *AuthUseCase) SignIn(ctx context.Context, username string, password string) (string, error) {
-	// проверить, есть ли пользователь в базе
-	user, err := u.userRepo.GetByUsername(ctx, username)
-	if err != nil {
-		if errors.Is(err, errs.ErrNotFound{}) {
-			// если нет, то создать пользователя и вернуть для него токен
-			hashed, err := u.hashService.HashPassword(password)
-			if err != nil {
-				return "", err
-			}
+	var token string
 
-			newUser, err := u.userRepo.Create(ctx, entities.UserData{
-				Username:       username,
-				HashedPassword: hashed,
-				Role:           entities.RoleUser,
-			})
-			if err != nil {
-				return "", err
-			}
+	err := u.transactionManager.Do(ctx, func(ctx context.Context) error {
+		user, err := u.userRepo.GetByUsername(ctx, username)
 
-			token, err := u.tokenService.GenerateToken(
-				newUser.ID,
-				newUser.Username,
-				newUser.Role,
-			)
+		switch {
+
+		// юзера в базе не нашли, создаём юзера
+		case err != nil && errors.Is(err, errs.ErrNotFoundError):
+			token, err = u.getTokenForNewUser(ctx, username, password)
 			if err != nil {
-				return "", err
+				return err
 			}
-			return token, nil
+			return nil
+
+		// что-то пошло не так
+		case err != nil:
+			return err
+
+		// юзер нашёлся, генерим токен
+		default:
+			token, err = u.getTokenForExistingUser(user, password)
+			if err != nil {
+				return err
+			}
+			return nil
 		}
-		// что-то пошло не так, отдаём внутреннюю ошибку
+	})
+
+	if err != nil {
 		return "", err
 	}
-	// если есть, то проверить пароль на валидность
-	if u.hashService.CompareWithPassword(user.HashedPassword, password) {
-		// и если он валиден то отдать токен
-		token, err := u.tokenService.GenerateToken(user.ID, user.Username, user.Role)
-		if err != nil {
-			return "", err
-		}
-		return token, nil
+	return token, nil
+}
+
+func (u *AuthUseCase) getTokenForNewUser(ctx context.Context, username, password string) (string, error) {
+	hashed, err := u.hashService.HashPassword(password)
+	if err != nil {
+		return "", err
 	}
-	// а если невалиден, то отдаём ошибку доступа
-	return "", errs.ErrNoAccessError
+
+	// создаём пользователя
+	newUser, err := u.createUser(ctx, username, hashed)
+	if err != nil {
+		return "", err
+	}
+
+	// начисляем монетки
+	err = u.creditInitialAmount(ctx, newUser.ID)
+	if err != nil {
+		return "", err
+	}
+
+	// возвращаем токен
+	return u.tokenService.GenerateToken(
+		newUser.ID,
+		newUser.Username,
+		newUser.Role,
+	)
+}
+
+func (u *AuthUseCase) createUser(ctx context.Context, username, hashedPassword string) (*entities.User, error) {
+	return u.userRepo.Create(ctx, entities.UserData{
+		Username:       username,
+		HashedPassword: hashedPassword,
+		Role:           entities.RoleUser,
+	})
+}
+
+func (u *AuthUseCase) creditInitialAmount(ctx context.Context, userID int) error {
+	_, err := u.transactionRepo.CreateTransaction(ctx, entities.TransactionData{
+		UserID:          userID,
+		Amount:          1000,
+		TransactionType: entities.TransactionCredit,
+		ReferenceId:     uuid.New(),
+	})
+	return err
+}
+
+func (u *AuthUseCase) getTokenForExistingUser(user *entities.User, password string) (string, error) {
+	if !u.hashService.CompareWithPassword(user.HashedPassword, password) {
+		return "", errs.ErrNoAccessError
+	}
+
+	return u.tokenService.GenerateToken(
+		user.ID,
+		user.Username,
+		user.Role,
+	)
 }

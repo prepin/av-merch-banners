@@ -11,14 +11,14 @@ func AuthMiddleware(jwt *auth.JWTService) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("token")
 		if authHeader == "" {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "authorization header required"})
+			c.JSON(http.StatusUnauthorized, gin.H{"errors": "authorization header required"})
 			c.Abort()
 			return
 		}
 
 		claims, err := jwt.ValidateToken(authHeader)
 		if err != nil {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})
+			c.JSON(http.StatusUnauthorized, gin.H{"errors": "invalid token"})
 			c.Abort()
 			return
 		}
@@ -34,13 +34,13 @@ func AdminOnly() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		role, exists := c.Get("role")
 		if !exists {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+			c.JSON(http.StatusUnauthorized, gin.H{"errors": "unauthorized"})
 			c.Abort()
 			return
 		}
 
 		if role != "admin" {
-			c.JSON(http.StatusForbidden, gin.H{"error": "admin access required"})
+			c.JSON(http.StatusForbidden, gin.H{"errors": "admin access required"})
 			c.Abort()
 			return
 		}

@@ -24,14 +24,7 @@ type E2ETestSuite struct {
 }
 
 var authUrl = "/api/v1/auth"
-
-type bannerItem struct {
-	ID        int    `json:"id"`
-	Content   string `json:"content"`
-	TagIds    []int  `json:"tag_ids"`
-	FeatureId int    `json:"feature_id"`
-	IsActive  bool   `json:"is_active"`
-}
+var sendCoinUrl = "/api/v1/sendCoin"
 
 type errorResponse struct {
 	Error string `json:"errors"`

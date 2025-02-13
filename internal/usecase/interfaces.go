@@ -21,6 +21,7 @@ type TransactionManager interface {
 }
 
 type UserRepo interface {
+	GetByID(ctx context.Context, userId int) (*entities.User, error)
 	GetByUsername(ctx context.Context, username string) (*entities.User, error)
 	Create(ctx context.Context, data entities.UserData) (*entities.User, error)
 }

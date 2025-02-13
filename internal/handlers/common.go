@@ -11,6 +11,7 @@ type ErrorResponse struct {
 var NotFoundResponse = ErrorResponse{Error: "not found"}
 var InvalidRequestResponse = ErrorResponse{Error: "invalid request"}
 var ServerErrorResponse = ErrorResponse{Error: "server error"}
+var UnauthorizedResponse = ErrorResponse{Error: "unauthorized"}
 
 func formatValidationError(err error) string {
 	if validationErrors, ok := err.(validator.ValidationErrors); ok {

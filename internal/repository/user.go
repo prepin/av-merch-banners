@@ -50,6 +50,30 @@ func (r *PGUserRepo) GetByUsername(ctx context.Context, username string) (*entit
 	return &user, nil
 }
 
+func (r *PGUserRepo) GetByID(ctx context.Context, userId int) (*entities.User, error) {
+
+	stmt := psql.Select(
+		sm.From("users"),
+		sm.Where(psql.Quote("id").EQ(psql.Arg(userId))),
+		sm.Limit(1),
+	)
+
+	query, args := stmt.MustBuild(ctx)
+
+	row, _ := r.db.Conn(ctx).Query(ctx, query, args...)
+	user, err := pgx.CollectOneRow(row, pgx.RowToStructByName[entities.User])
+
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, errs.ErrNotFound{Err: err}
+		}
+		r.logger.Error("Failed query user", "error", errs.ErrInternal{Err: err})
+		return nil, err
+	}
+
+	return &user, nil
+}
+
 func (r *PGUserRepo) Create(ctx context.Context, data entities.UserData) (*entities.User, error) {
 	stmt := psql.Insert(
 		im.Into("users", "username", "hashed_password", "role"),

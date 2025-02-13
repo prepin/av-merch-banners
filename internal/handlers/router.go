@@ -17,6 +17,7 @@ type Handlers struct {
 	config *config.Config
 	Auth   *AuthHandler
 	Credit *CreditHandler
+	Send   *SendCoinsHandler
 }
 
 func NewHandlers(cfg *config.Config, usecases usecase.Usecases) *Handlers {
@@ -24,6 +25,7 @@ func NewHandlers(cfg *config.Config, usecases usecase.Usecases) *Handlers {
 		config: cfg,
 		Auth:   NewAuthHandler(cfg.Logger, usecases.AuthUseCase),
 		Credit: NewCreditHandler(cfg.Logger, usecases.CreditUseCase),
+		Send:   NewSendCoinHandler(cfg.Logger, usecases.SendCoinsUseCase),
 	}
 }
 
@@ -54,12 +56,16 @@ func (h *Handlers) RegisterRoutes(r *gin.Engine, jwtService *auth.JWTService) {
 
 			protected := g.Group("")
 			protected.Use(middleware.AuthMiddleware(jwtService))
-
 			{
-				// put protected routes here
+				// отправка монет другому пользователю
+				protected.POST("/sendCoin", h.Send.PostSendCoins)
+			}
+
+			{ // роуты для пользователей с ролью админа,
 				admin := protected.Group("")
 				admin.Use(middleware.AdminOnly())
 				{
+					// начислить деньги пользователю
 					admin.POST("/credit", h.Credit.PostCredit)
 				}
 			}

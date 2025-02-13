@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"av-merch-shop/config"
-	"av-merch-shop/internal/infrastructure/middleware"
+	"av-merch-shop/internal/api/middleware"
 	"av-merch-shop/internal/usecase"
 	"av-merch-shop/pkg/auth"
 	"reflect"

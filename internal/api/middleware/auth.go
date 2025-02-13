@@ -1,6 +1,8 @@
 package middleware
 
 import (
+	"av-merch-shop/internal/api/common"
+	"av-merch-shop/internal/entities"
 	"av-merch-shop/pkg/auth"
 	"net/http"
 	"strings"
@@ -31,8 +33,8 @@ func AuthMiddleware(jwt *auth.JWTService) gin.HandlerFunc {
 			return
 		}
 
-		c.Set("userID", claims.UserID)
-		c.Set("role", claims.Role)
+		c.Set(common.ContextUserID, claims.UserID)
+		c.Set(common.ContextRole, claims.Role)
 
 		c.Next()
 	}
@@ -40,14 +42,14 @@ func AuthMiddleware(jwt *auth.JWTService) gin.HandlerFunc {
 
 func AdminOnly() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		role, exists := c.Get("role")
+		role, exists := c.Get(common.ContextRole)
 		if !exists {
 			c.JSON(http.StatusUnauthorized, gin.H{"errors": "unauthorized"})
 			c.Abort()
 			return
 		}
 
-		if role != "admin" {
+		if role != entities.RoleAdmin {
 			c.JSON(http.StatusForbidden, gin.H{"errors": "admin access required"})
 			c.Abort()
 			return

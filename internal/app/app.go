@@ -2,7 +2,7 @@ package app
 
 import (
 	"av-merch-shop/config"
-	"av-merch-shop/internal/handlers"
+	"av-merch-shop/internal/api/handlers"
 	"av-merch-shop/internal/repository"
 	"av-merch-shop/internal/usecase"
 	"av-merch-shop/pkg/auth"

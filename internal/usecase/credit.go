@@ -53,7 +53,7 @@ func (u *CreditUseCase) Credit(
 		}
 
 		// записываем транзакцию в БД
-		tr, err = u.transactionRepo.CreateTransaction(ctx, entities.TransactionData{
+		tr, err = u.transactionRepo.Create(ctx, entities.TransactionData{
 			UserID:          user.ID,
 			Amount:          data.Amount,
 			TransactionType: entities.TransactionCredit,

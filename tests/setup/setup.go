@@ -6,7 +6,6 @@ import (
 	"av-merch-shop/pkg/auth"
 	"av-merch-shop/pkg/database"
 	"av-merch-shop/tests/testdb"
-	"fmt"
 	"log/slog"
 	"net/http"
 	"net/http/httptest"
@@ -47,7 +46,6 @@ func SetupTestEnv(t *testing.T) (*TestEnv, func(), func(), func()) {
 	}
 
 	dropSeedData := func() {
-		fmt.Println("CLEANING DB")
 		if err := testDB.CleanDatabase(); err != nil {
 			testDB.TerminateDB()
 			t.Fatalf("Failed to clean database: %v", err)

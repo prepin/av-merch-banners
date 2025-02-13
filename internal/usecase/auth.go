@@ -100,7 +100,7 @@ func (u *AuthUseCase) createUser(ctx context.Context, username, hashedPassword s
 }
 
 func (u *AuthUseCase) creditInitialAmount(ctx context.Context, userID int) error {
-	_, err := u.transactionRepo.CreateTransaction(ctx, entities.TransactionData{
+	_, err := u.transactionRepo.Create(ctx, entities.TransactionData{
 		UserID:          userID,
 		Amount:          DefaultBalanceForUser,
 		TransactionType: entities.TransactionCredit,

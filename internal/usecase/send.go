@@ -14,8 +14,8 @@ type SendCoinUseCase struct {
 	userRepo           UserRepo
 }
 
-func NewSendCoinUseCase(tm TransactionManager, tr TransactionRepo, ur UserRepo) *CreditUseCase {
-	return &CreditUseCase{
+func NewSendCoinUseCase(tm TransactionManager, tr TransactionRepo, ur UserRepo) *SendCoinUseCase {
+	return &SendCoinUseCase{
 		transactionManager: tm,
 		transactionRepo:    tr,
 		userRepo:           ur,
@@ -65,12 +65,12 @@ func (u *SendCoinUseCase) Send(ctx context.Context, data *entities.TransferData)
 			ReferenceId:    ref,
 		}
 
-		_, err = u.transactionRepo.CreateTransaction(ctx, outTrData)
+		_, err = u.transactionRepo.Create(ctx, outTrData)
 		if err != nil {
 			return err
 		}
 
-		_, err = u.transactionRepo.CreateTransaction(ctx, inTrData)
+		_, err = u.transactionRepo.Create(ctx, inTrData)
 		if err != nil {
 			return err
 		}

@@ -18,6 +18,8 @@ func New(cfg *config.Config, db *database.Database) *Application {
 		TransactionManager: db.TransactionManager,
 		UserRepo:           repository.NewPGUserRepo(db, cfg.Logger),
 		TransactionRepo:    repository.NewPGTransactionRepo(db, cfg.Logger),
+		ItemRepo:           repository.NewPGItemRepo(db, cfg.Logger),
+		OrderRepo:          repository.NewPGOrderRepo(db, cfg.Logger),
 	}
 
 	services := usecase.Services{

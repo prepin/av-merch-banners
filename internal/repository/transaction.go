@@ -47,7 +47,7 @@ func (r *PGTransactionRepo) GetUserBalance(ctx context.Context, userId int) (int
 }
 
 // Создаёт запись о новой транзакции
-func (r *PGTransactionRepo) CreateTransaction(ctx context.Context, data entities.TransactionData) (*entities.Transaction, error) {
+func (r *PGTransactionRepo) Create(ctx context.Context, data entities.TransactionData) (*entities.Transaction, error) {
 
 	var counterpartyId any = data.CounterpartyID
 	if data.CounterpartyID == 0 {

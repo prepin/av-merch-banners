@@ -25,6 +25,7 @@ type E2ETestSuite struct {
 
 var authUrl = "/api/v1/auth"
 var sendCoinUrl = "/api/v1/sendCoin"
+var orderUrl = "/api/v1/buy/"
 
 type errorResponse struct {
 	Error string `json:"errors"`

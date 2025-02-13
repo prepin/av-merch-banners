@@ -9,6 +9,8 @@ type Repos struct {
 	TransactionManager TransactionManager
 	UserRepo           UserRepo
 	TransactionRepo    TransactionRepo
+	ItemRepo           ItemRepo
+	OrderRepo          OrderRepo
 }
 
 type Services struct {
@@ -28,7 +30,15 @@ type UserRepo interface {
 
 type TransactionRepo interface {
 	GetUserBalance(ctx context.Context, userId int) (int, error)
-	CreateTransaction(ctx context.Context, data entities.TransactionData) (*entities.Transaction, error)
+	Create(ctx context.Context, data entities.TransactionData) (*entities.Transaction, error)
+}
+
+type OrderRepo interface {
+	Create(ctx context.Context, data entities.OrderData) (*entities.Order, error)
+}
+
+type ItemRepo interface {
+	GetItemByName(ctx context.Context, itemName string) (*entities.Item, error)
 }
 
 type TokenService interface {

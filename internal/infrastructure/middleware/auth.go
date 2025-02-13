@@ -3,20 +3,28 @@ package middleware
 import (
 	"av-merch-shop/pkg/auth"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
 
 func AuthMiddleware(jwt *auth.JWTService) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		authHeader := c.GetHeader("token")
+		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {
 			c.JSON(http.StatusUnauthorized, gin.H{"errors": "authorization header required"})
 			c.Abort()
 			return
 		}
 
-		claims, err := jwt.ValidateToken(authHeader)
+		bearerToken := strings.Split(authHeader, "Bearer ")
+		if len(bearerToken) != 2 {
+			c.JSON(http.StatusUnauthorized, gin.H{"errors": "invalid authorization format"})
+			c.Abort()
+			return
+		}
+
+		claims, err := jwt.ValidateToken(bearerToken[1])
 		if err != nil {
 			c.JSON(http.StatusUnauthorized, gin.H{"errors": "invalid token"})
 			c.Abort()

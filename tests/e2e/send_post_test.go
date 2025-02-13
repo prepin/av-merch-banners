@@ -116,7 +116,7 @@ func (s *E2ETestSuite) TestSendCoin() {
 				SetError(&errorResponse)
 
 			if tt.useToken {
-				req.SetHeader("token", tt.token)
+				req.SetHeader("Authorization", "Bearer "+tt.token)
 			}
 
 			resp, err := req.Post(s.env.Server.URL + sendCoinUrl)

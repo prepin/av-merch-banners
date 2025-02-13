@@ -141,9 +141,10 @@ func (s *E2ETestSuite) TestCreditPost() {
 				SetError(&errorResponse)
 
 			if tt.useToken {
-				req.SetHeader("token", directorToken)
+				req.SetHeader("Authorization", "Bearer "+directorToken)
+
 			} else if tt.useEmployeeToken {
-				req.SetHeader("token", employeeToken)
+				req.SetHeader("Authorization", "Bearer "+employeeToken)
 			}
 
 			resp, err := req.Post(s.env.Server.URL + "/api/credit")

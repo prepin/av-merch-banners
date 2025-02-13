@@ -88,7 +88,7 @@ func (td *TestDatabase) MigrateConnectionString() string {
 	return "postgresql://" + td.ConnectionString()[len("postgres://"):]
 }
 
-func (td *TestDatabase) Cleanup() {
+func (td *TestDatabase) TerminateDB() {
 	if td.container != nil {
 		td.container.Terminate(td.ctx)
 	}

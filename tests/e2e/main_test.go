@@ -16,9 +16,11 @@ func TestMain(m *testing.M) {
 
 type E2ETestSuite struct {
 	suite.Suite
-	env     *setup.TestEnv
-	cleanup func()
-	client  *resty.Client
+	env       *setup.TestEnv
+	cleanup   func()
+	loadData  func()
+	cleanData func()
+	client    *resty.Client
 }
 
 var authUrl = "/api/v1/auth"
@@ -32,12 +34,17 @@ type bannerItem struct {
 }
 
 type errorResponse struct {
-	Error string `json:"error"`
+	Error string `json:"errors"`
 }
 
 func (s *E2ETestSuite) SetupTest() {
-	s.env, s.cleanup = setup.SetupTestEnv(s.T())
+	s.env, s.cleanup, s.loadData, s.cleanData = setup.SetupTestEnv(s.T())
 	s.client = resty.New()
+}
+
+func (s *E2ETestSuite) SetupSubTest() {
+	s.cleanData()
+	s.loadData()
 }
 
 func (s *E2ETestSuite) TearDownTest() {

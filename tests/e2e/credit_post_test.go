@@ -58,12 +58,12 @@ func (s *E2ETestSuite) TestCreditPost() {
 			name: "add credit to existing user",
 			payload: CreditRequest{
 				Username: "employee",
-				Amount:   100,
+				Amount:   110,
 			},
 			expectedCode:      http.StatusCreated,
 			isSuccess:         true,
 			useToken:          true,
-			expectedNewAmount: 100,
+			expectedNewAmount: 1110,
 		},
 		{
 			name: "add credit without token",
@@ -96,13 +96,13 @@ func (s *E2ETestSuite) TestCreditPost() {
 			expectedCode:      http.StatusCreated,
 			isSuccess:         true,
 			useToken:          true,
-			expectedNewAmount: 50,
+			expectedNewAmount: 950,
 		},
 		{
 			name: "reduce credit beyond balance",
 			payload: CreditRequest{
 				Username: "employee",
-				Amount:   -1000,
+				Amount:   -2000,
 			},
 			expectedCode:      http.StatusCreated,
 			isSuccess:         true,

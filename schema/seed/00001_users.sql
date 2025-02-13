@@ -14,6 +14,4 @@ VALUES
   );
 
 -- +goose Down
-DELETE FROM users
-WHERE
-  username in ('employee', 'director');
+DELETE FROM users;

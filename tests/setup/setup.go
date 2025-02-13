@@ -6,6 +6,7 @@ import (
 	"av-merch-shop/pkg/auth"
 	"av-merch-shop/pkg/database"
 	"av-merch-shop/tests/testdb"
+	"fmt"
 	"log/slog"
 	"net/http"
 	"net/http/httptest"
@@ -24,36 +25,37 @@ type TestEnv struct {
 	JWT        *auth.JWTService
 }
 
-func SetupTestEnv(t *testing.T) (*TestEnv, func()) {
+// Возвращает Окружение, функцию остановки тест-контейнера, функцию загрузки сидов,
+// функцию очистки сидов
+func SetupTestEnv(t *testing.T) (*TestEnv, func(), func(), func()) {
 	t.Helper()
 
-	// Initialize test database
-	// May be split this in future so container is create once for test session
-	// Instead of separate container for each test case.
 	testDB, err := testdb.NewTestDatabase()
 	if err != nil {
 		t.Fatalf("Failed to create test database: %v", err)
 	}
 
-	// Run migrations
-	if err := testDB.RunMigrations(); err != nil {
-		testDB.Cleanup()
-		t.Fatalf("Failed to run migrations: %v", err)
+	loadSeedData := func() {
+		if err := testDB.RunMigrations(); err != nil {
+			testDB.TerminateDB()
+			t.Fatalf("Failed to run migrations: %v", err)
+		}
+		if err := testDB.LoadFixtures(); err != nil {
+			testDB.TerminateDB()
+			t.Fatalf("Failed to load fixtures %v", err)
+		}
 	}
 
-	// Clean database (just in case)
-	if err := testDB.CleanDatabase(); err != nil {
-		testDB.Cleanup()
-		t.Fatalf("Failed to clean database: %v", err)
+	dropSeedData := func() {
+		fmt.Println("CLEANING DB")
+		if err := testDB.CleanDatabase(); err != nil {
+			testDB.TerminateDB()
+			t.Fatalf("Failed to clean database: %v", err)
+		}
 	}
 
-	// Load fixtures
-	if err := testDB.LoadFixtures(); err != nil {
-		testDB.Cleanup()
-		t.Fatalf("Failed to load fixtures %v", err)
-	}
+	loadSeedData()
 
-	// Create test config
 	cfg := &config.Config{
 		Logger: InitTestLogger(),
 		DB:     testDB.Config, // Use the database config directly
@@ -68,21 +70,16 @@ func SetupTestEnv(t *testing.T) (*TestEnv, func()) {
 		},
 	}
 
-	// Initialize database connection
 	db := database.NewDatabase(cfg.DB)
 
-	// Create application
 	application := app.New(cfg, db)
 
-	// Setup router
 	gin.SetMode(gin.TestMode)
 	router := gin.Default()
 	jwtService := auth.NewJWTService(cfg)
 
-	// Register routes
 	application.Handlers.RegisterRoutes(router, jwtService)
 
-	// Create test server
 	testServer := httptest.NewServer(router)
 
 	env := &TestEnv{
@@ -97,10 +94,10 @@ func SetupTestEnv(t *testing.T) (*TestEnv, func()) {
 	cleanup := func() {
 		testServer.Close()
 		db.Close()
-		testDB.Cleanup()
+		testDB.TerminateDB()
 	}
 
-	return env, cleanup
+	return env, cleanup, loadSeedData, dropSeedData
 }
 
 func InitTestLogger() *slog.Logger {

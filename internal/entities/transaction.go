@@ -17,7 +17,7 @@ const (
 type Transaction struct {
 	ID              int
 	UserID          int
-	RecipientID     int
+	CounterpartyID  int
 	Amount          int
 	TransactionType transactionType
 	ReferenceId     uuid.UUID `db:"transaction_reference_id"`
@@ -26,7 +26,7 @@ type Transaction struct {
 
 type TransactionData struct {
 	UserID          int
-	RecipientID     int
+	CounterpartyID  int
 	Amount          int
 	TransactionType transactionType
 	ReferenceId     uuid.UUID

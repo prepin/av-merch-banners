@@ -49,26 +49,26 @@ func (r *PGTransactionRepo) GetUserBalance(ctx context.Context, userId int) (int
 // Создаёт запись о новой транзакции
 func (r *PGTransactionRepo) CreateTransaction(ctx context.Context, data entities.TransactionData) (*entities.Transaction, error) {
 
-	var recipientID interface{} = data.RecipientID
-	if data.RecipientID == 0 {
-		recipientID = nil
+	var counterpartyId any = data.CounterpartyID
+	if data.CounterpartyID == 0 {
+		counterpartyId = nil
 	}
 
 	stmt := psql.Insert(
 		im.Into(
 			"transactions",
-			"user_id", "recipient_id",
+			"user_id", "counterparty_id",
 			"amount", "transaction_type",
 			"transaction_reference_id",
 		),
 		im.Values(
 			psql.Arg(
-				data.UserID, recipientID,
+				data.UserID, counterpartyId,
 				data.Amount, data.TransactionType,
 				data.ReferenceId,
 			),
 		),
-		im.Returning("id", "user_id", "recipient_id", "amount", "transaction_type", "transaction_reference_id", "created_at"),
+		im.Returning("id", "user_id", "counterparty_id", "amount", "transaction_type", "transaction_reference_id", "created_at"),
 	)
 
 	query, args := stmt.MustBuild(ctx)
@@ -78,10 +78,10 @@ func (r *PGTransactionRepo) CreateTransaction(ctx context.Context, data entities
 	// тут пришлось заморочиться с конверсией NULL поля
 	transaction, err := pgx.CollectOneRow(row, func(row pgx.CollectableRow) (entities.Transaction, error) {
 		var t entities.Transaction
-		var recipientID sql.NullInt64
+		var counterpartyId sql.NullInt64
 
 		err := row.Scan(
-			&t.ID, &t.UserID, &recipientID,
+			&t.ID, &t.UserID, &counterpartyId,
 			&t.Amount, &t.TransactionType, &t.ReferenceId,
 			&t.CreatedAt,
 		)
@@ -89,10 +89,10 @@ func (r *PGTransactionRepo) CreateTransaction(ctx context.Context, data entities
 			return t, err
 		}
 
-		if recipientID.Valid {
-			t.RecipientID = int(recipientID.Int64)
+		if counterpartyId.Valid {
+			t.CounterpartyID = int(counterpartyId.Int64)
 		} else {
-			t.RecipientID = 0
+			t.CounterpartyID = 0
 		}
 
 		return t, nil

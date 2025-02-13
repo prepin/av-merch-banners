@@ -17,6 +17,8 @@ type AuthUseCase struct {
 	hashService        HashService
 }
 
+const DefaultBalanceForUser = 1000
+
 func NewAuthUsecase(tm TransactionManager, ur UserRepo, tr TransactionRepo, ts TokenService, hs HashService) *AuthUseCase {
 	return &AuthUseCase{
 		transactionManager: tm,
@@ -100,7 +102,7 @@ func (u *AuthUseCase) createUser(ctx context.Context, username, hashedPassword s
 func (u *AuthUseCase) creditInitialAmount(ctx context.Context, userID int) error {
 	_, err := u.transactionRepo.CreateTransaction(ctx, entities.TransactionData{
 		UserID:          userID,
-		Amount:          1000,
+		Amount:          DefaultBalanceForUser,
 		TransactionType: entities.TransactionCredit,
 		ReferenceId:     uuid.New(),
 	})

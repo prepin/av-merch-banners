@@ -26,7 +26,7 @@ func Load() *Config {
 func (c *Config) load() {
 	err := godotenv.Load()
 	if err != nil {
-		c.Logger.Warn("Warning: .env file not found or error loading:", "error", err)
+		c.Logger.Debug(".env file not found, only ENV variables are used")
 	}
 
 	c.loadDBConfig()

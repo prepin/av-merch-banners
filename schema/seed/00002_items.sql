@@ -10,7 +10,9 @@ VALUES
   ('hoody', 300),
   ('umbrella', 200),
   ('socks', 10),
-  ('wallet', 50);
+  ('wallet', 50) ON CONFLICT DO NOTHING;
+
+;
 
 -- +goose Down
 DELETE FROM ITEMS;

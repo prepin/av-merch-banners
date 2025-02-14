@@ -13,7 +13,7 @@ SELECT
   'CREDIT' as transaction_type,
   gen_random_uuid () as transaction_reference_id
 FROM
-  users;
+  users ON CONFLICT DO NOTHING;
 
 -- +goose StatementEnd
 -- +goose Down

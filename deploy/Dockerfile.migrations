@@ -1,0 +1,16 @@
+# FROM golang:1.24-alpine
+# RUN go install github.com/pressly/goose/v3/cmd/goose@latest
+FROM alpine:latest
+WORKDIR /app
+RUN mkdir migrations seeds
+
+RUN wget -O /usr/local/bin/goose https://github.com/pressly/goose/releases/download/v3.24.1/goose_linux_x86_64 \
+  && chmod +x /usr/local/bin/goose
+
+COPY schema/migrations/*.sql /app/migrations/
+COPY schema/seed/*.sql /app/seeds/
+COPY deploy/run-migrations.sh /app/
+
+RUN chmod +x /app/run-migrations.sh
+
+ENTRYPOINT ["/app/run-migrations.sh"]

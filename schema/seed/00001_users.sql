@@ -11,7 +11,7 @@ VALUES
     'director',
     '$2a$10$IMGLbeNyoaBT4xFC9qhN/.D3mks1wQ510baxLTI0Ie6zoMQR5ACEa',
     'admin'
-  );
+  ) ON CONFLICT DO NOTHING;
 
 -- +goose Down
 DELETE FROM users;

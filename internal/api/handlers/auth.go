@@ -12,7 +12,7 @@ import (
 
 type AuthHandler struct {
 	logger  *slog.Logger
-	usecase *usecase.AuthUseCase
+	usecase usecase.AuthUseCase
 }
 
 type AuthPostParams struct {
@@ -24,7 +24,7 @@ type AuthTokenResponse struct {
 	Token string `json:"token"`
 }
 
-func NewAuthHandler(l *slog.Logger, uc *usecase.AuthUseCase) *AuthHandler {
+func NewAuthHandler(l *slog.Logger, uc usecase.AuthUseCase) *AuthHandler {
 	handler := &AuthHandler{
 		logger:  l,
 		usecase: uc,

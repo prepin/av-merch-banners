@@ -3,26 +3,29 @@ package usecase
 import (
 	"av-merch-shop/internal/entities"
 	"context"
-	"fmt"
 
 	"github.com/google/uuid"
 )
 
-type CreditUseCase struct {
+type creditUseCase struct {
 	transactionManager TransactionManager
 	transactionRepo    TransactionRepo
 	userRepo           UserRepo
 }
 
-func NewCreditUseCase(tm TransactionManager, tr TransactionRepo, ur UserRepo) *CreditUseCase {
-	return &CreditUseCase{
+type CreditUseCase interface {
+	Credit(ctx context.Context, data *entities.CreditData) (*entities.CreditTransactionResult, error)
+}
+
+func NewCreditUseCase(tm TransactionManager, tr TransactionRepo, ur UserRepo) CreditUseCase {
+	return &creditUseCase{
 		transactionManager: tm,
 		transactionRepo:    tr,
 		userRepo:           ur,
 	}
 }
 
-func (u *CreditUseCase) Credit(
+func (u *creditUseCase) Credit(
 	ctx context.Context,
 	data *entities.CreditData,
 ) (
@@ -70,7 +73,6 @@ func (u *CreditUseCase) Credit(
 		return nil, err
 	}
 
-	fmt.Println("БАЛАНС", balance, "ИЗМЕНЕНИЕ", data.Amount)
 	return &entities.CreditTransactionResult{
 		NewAmount:   balance + data.Amount,
 		ReferenceID: tr.ReferenceId,

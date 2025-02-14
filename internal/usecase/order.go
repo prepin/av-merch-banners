@@ -7,12 +7,16 @@ import (
 	"github.com/google/uuid"
 )
 
-type OrderUseCase struct {
+type orderUseCase struct {
 	transactionManager TransactionManager
 	transactionRepo    TransactionRepo
 	userRepo           UserRepo
 	itemRepo           ItemRepo
 	orderRepo          OrderRepo
+}
+
+type OrderUseCase interface {
+	Buy(ctx context.Context, data *entities.OrderRequest) error
 }
 
 func NewOrderUseCase(
@@ -21,8 +25,8 @@ func NewOrderUseCase(
 	ur UserRepo,
 	ir ItemRepo,
 	or OrderRepo,
-) *OrderUseCase {
-	return &OrderUseCase{
+) OrderUseCase {
+	return &orderUseCase{
 		transactionManager: tm,
 		transactionRepo:    tr,
 		userRepo:           ur,
@@ -31,7 +35,7 @@ func NewOrderUseCase(
 	}
 }
 
-func (u *OrderUseCase) Buy(ctx context.Context, data *entities.OrderRequest) error {
+func (u *orderUseCase) Buy(ctx context.Context, data *entities.OrderRequest) error {
 
 	err := u.transactionManager.Do(ctx, func(ctx context.Context) error {
 		// проверяем что вещь существует

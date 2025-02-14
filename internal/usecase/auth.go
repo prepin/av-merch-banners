@@ -9,7 +9,7 @@ import (
 	"github.com/google/uuid"
 )
 
-type AuthUseCase struct {
+type authUseCase struct {
 	transactionManager TransactionManager
 	userRepo           UserRepo
 	transactionRepo    TransactionRepo
@@ -17,10 +17,14 @@ type AuthUseCase struct {
 	hashService        HashService
 }
 
+type AuthUseCase interface {
+	SignIn(ctx context.Context, username string, password string) (string, error)
+}
+
 const DefaultBalanceForUser = 1000
 
-func NewAuthUsecase(tm TransactionManager, ur UserRepo, tr TransactionRepo, ts TokenService, hs HashService) *AuthUseCase {
-	return &AuthUseCase{
+func NewAuthUsecase(tm TransactionManager, ur UserRepo, tr TransactionRepo, ts TokenService, hs HashService) AuthUseCase {
+	return &authUseCase{
 		transactionManager: tm,
 		userRepo:           ur,
 		transactionRepo:    tr,
@@ -29,7 +33,7 @@ func NewAuthUsecase(tm TransactionManager, ur UserRepo, tr TransactionRepo, ts T
 	}
 }
 
-func (u *AuthUseCase) SignIn(ctx context.Context, username string, password string) (string, error) {
+func (u *authUseCase) SignIn(ctx context.Context, username string, password string) (string, error) {
 	var token string
 
 	err := u.transactionManager.Do(ctx, func(ctx context.Context) error {
@@ -65,7 +69,7 @@ func (u *AuthUseCase) SignIn(ctx context.Context, username string, password stri
 	return token, nil
 }
 
-func (u *AuthUseCase) getTokenForNewUser(ctx context.Context, username, password string) (string, error) {
+func (u *authUseCase) getTokenForNewUser(ctx context.Context, username, password string) (string, error) {
 	hashed, err := u.hashService.HashPassword(password)
 	if err != nil {
 		return "", err
@@ -91,7 +95,7 @@ func (u *AuthUseCase) getTokenForNewUser(ctx context.Context, username, password
 	)
 }
 
-func (u *AuthUseCase) createUser(ctx context.Context, username, hashedPassword string) (*entities.User, error) {
+func (u *authUseCase) createUser(ctx context.Context, username, hashedPassword string) (*entities.User, error) {
 	return u.userRepo.Create(ctx, entities.UserData{
 		Username:       username,
 		HashedPassword: hashedPassword,
@@ -99,7 +103,7 @@ func (u *AuthUseCase) createUser(ctx context.Context, username, hashedPassword s
 	})
 }
 
-func (u *AuthUseCase) creditInitialAmount(ctx context.Context, userID int) error {
+func (u *authUseCase) creditInitialAmount(ctx context.Context, userID int) error {
 	_, err := u.transactionRepo.Create(ctx, entities.TransactionData{
 		UserID:          userID,
 		Amount:          DefaultBalanceForUser,
@@ -109,7 +113,7 @@ func (u *AuthUseCase) creditInitialAmount(ctx context.Context, userID int) error
 	return err
 }
 
-func (u *AuthUseCase) getTokenForExistingUser(user *entities.User, password string) (string, error) {
+func (u *authUseCase) getTokenForExistingUser(user *entities.User, password string) (string, error) {
 	if !u.hashService.CompareWithPassword(user.HashedPassword, password) {
 		return "", errs.ErrNoAccessError
 	}

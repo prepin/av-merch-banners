@@ -8,21 +8,25 @@ import (
 	"github.com/google/uuid"
 )
 
-type SendCoinUseCase struct {
+type sendCoinUseCase struct {
 	transactionManager TransactionManager
 	transactionRepo    TransactionRepo
 	userRepo           UserRepo
 }
 
-func NewSendCoinUseCase(tm TransactionManager, tr TransactionRepo, ur UserRepo) *SendCoinUseCase {
-	return &SendCoinUseCase{
+type SendCoinUseCase interface {
+	Send(ctx context.Context, data *entities.TransferData) error
+}
+
+func NewSendCoinUseCase(tm TransactionManager, tr TransactionRepo, ur UserRepo) SendCoinUseCase {
+	return &sendCoinUseCase{
 		transactionManager: tm,
 		transactionRepo:    tr,
 		userRepo:           ur,
 	}
 }
 
-func (u *SendCoinUseCase) Send(ctx context.Context, data *entities.TransferData) error {
+func (u *sendCoinUseCase) Send(ctx context.Context, data *entities.TransferData) error {
 
 	// не разрешаем перевести деньги в обратную сторону
 	if data.Amount <= 0 {

@@ -10,10 +10,10 @@ import (
 
 type InfoHandler struct {
 	logger  *slog.Logger
-	usecase *usecase.InfoUseCase
+	usecase usecase.InfoUseCase
 }
 
-func NewInfoHandler(l *slog.Logger, u *usecase.InfoUseCase) *InfoHandler {
+func NewInfoHandler(l *slog.Logger, u usecase.InfoUseCase) *InfoHandler {
 	return &InfoHandler{
 		logger:  l,
 		usecase: u,

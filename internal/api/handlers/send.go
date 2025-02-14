@@ -13,7 +13,7 @@ import (
 
 type SendCoinHandler struct {
 	logger  *slog.Logger
-	usecase *usecase.SendCoinUseCase
+	usecase usecase.SendCoinUseCase
 }
 
 type SendCoinParams struct {
@@ -21,7 +21,7 @@ type SendCoinParams struct {
 	Amount int    `json:"amount" binding:"required"`
 }
 
-func NewSendCoinHandler(l *slog.Logger, u *usecase.SendCoinUseCase) *SendCoinHandler {
+func NewSendCoinHandler(l *slog.Logger, u usecase.SendCoinUseCase) *SendCoinHandler {
 	return &SendCoinHandler{
 		logger:  l,
 		usecase: u,

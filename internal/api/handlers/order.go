@@ -13,14 +13,14 @@ import (
 
 type OrderHandler struct {
 	logger  *slog.Logger
-	usecase *usecase.OrderUseCase
+	usecase usecase.OrderUseCase
 }
 
 type OrderParams struct {
 	Item string `json:"item" binding:"required"`
 }
 
-func NewOrderHandler(l *slog.Logger, u *usecase.OrderUseCase) *OrderHandler {
+func NewOrderHandler(l *slog.Logger, u usecase.OrderUseCase) *OrderHandler {
 	return &OrderHandler{
 		logger:  l,
 		usecase: u,

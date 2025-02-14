@@ -1,11 +1,11 @@
 package usecase
 
 type Usecases struct {
-	AuthUseCase     *AuthUseCase
-	CreditUseCase   *CreditUseCase
-	SendCoinUseCase *SendCoinUseCase
-	OrderUseCase    *OrderUseCase
-	InfoUseCase     *InfoUseCase
+	AuthUseCase     AuthUseCase
+	CreditUseCase   CreditUseCase
+	SendCoinUseCase SendCoinUseCase
+	OrderUseCase    OrderUseCase
+	InfoUseCase     InfoUseCase
 }
 
 func NewUsecases(r Repos, s Services) Usecases {

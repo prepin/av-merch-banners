@@ -14,7 +14,7 @@ import (
 
 type CreditHandler struct {
 	logger  *slog.Logger
-	usecase *usecase.CreditUseCase
+	usecase usecase.CreditUseCase
 }
 
 type CreditParams struct {
@@ -27,7 +27,7 @@ type CreditResponse struct {
 	ReferenceId uuid.UUID `json:"reference_id"`
 }
 
-func NewCreditHandler(l *slog.Logger, u *usecase.CreditUseCase) *CreditHandler {
+func NewCreditHandler(l *slog.Logger, u usecase.CreditUseCase) *CreditHandler {
 	return &CreditHandler{
 		logger:  l,
 		usecase: u,

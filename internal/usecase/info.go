@@ -5,21 +5,25 @@ import (
 	"context"
 )
 
-type InfoUseCase struct {
+type infoUseCase struct {
 	transactionRepo TransactionRepo
 	userRepo        UserRepo
 	orderRepo       OrderRepo
 }
 
-func NewInfoUseCase(ur UserRepo, tr TransactionRepo, or OrderRepo) *InfoUseCase {
-	return &InfoUseCase{
+type InfoUseCase interface {
+	GetInfo(ctx context.Context, userID int) (*entities.UserInfo, error)
+}
+
+func NewInfoUseCase(ur UserRepo, tr TransactionRepo, or OrderRepo) InfoUseCase {
+	return &infoUseCase{
 		transactionRepo: tr,
 		userRepo:        ur,
 		orderRepo:       or,
 	}
 }
 
-func (u *InfoUseCase) GetInfo(ctx context.Context, userID int) (*entities.UserInfo, error) {
+func (u *infoUseCase) GetInfo(ctx context.Context, userID int) (*entities.UserInfo, error) {
 
 	user, err := u.userRepo.GetByID(ctx, userID)
 	if err != nil {

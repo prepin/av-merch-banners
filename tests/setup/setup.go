@@ -56,12 +56,11 @@ func CreateTestEnv(t *testing.T) (env *TestEnv, cleanup, loadSeeds, dropSeeds fu
 
 	cfg := &config.Config{
 		Logger: InitTestLogger(),
-		DB:     testDB.Config, // Use the database config directly
+		DB:     testDB.Config,
 		Server: config.ServerConfig{
-			Port:           ":0",
-			ReadTimeout:    5,
-			WriteTimeout:   5,
-			RequestTimeout: 50,
+			Port:         ":0",
+			ReadTimeout:  5,
+			WriteTimeout: 5,
 		},
 		Auth: config.AuthConfig{
 			SecretKey: []byte("test-secret"),

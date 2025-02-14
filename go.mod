@@ -17,7 +17,6 @@ require (
 	github.com/stephenafamo/bob v0.30.0
 	github.com/stretchr/testify v1.10.0
 	github.com/testcontainers/testcontainers-go v0.35.0
-	github.com/vearne/gin-timeout v0.2.0
 	golang.org/x/crypto v0.33.0
 )
 

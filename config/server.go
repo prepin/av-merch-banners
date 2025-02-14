@@ -8,7 +8,6 @@ type ServerConfig struct {
 	Port           string
 	ReadTimeout    int
 	WriteTimeout   int
-	RequestTimeout int
 	ProductionMode bool
 }
 
@@ -21,11 +20,6 @@ func (c *Config) loadServerConfig() {
 	writeTimeout, err := strconv.Atoi(getEnv("AV_SERVER_WRITE_TIMEOUT", "5"))
 	if err != nil {
 		c.Logger.Error("Error: AV_SERVER_WRITE_TIMEOUT must be an integer")
-	}
-
-	requestTimeout, err := strconv.Atoi(getEnv("AV_REQUEST_TIMEOUT", "50"))
-	if err != nil {
-		c.Logger.Error("Error: AV_REQUEST_TIMEOUT must be an integer")
 	}
 
 	var productionMode bool
@@ -41,7 +35,6 @@ func (c *Config) loadServerConfig() {
 		Port:           getEnv("AV_SERVER_PORT", ":8080"),
 		ReadTimeout:    readTimeout,
 		WriteTimeout:   writeTimeout,
-		RequestTimeout: requestTimeout,
 		ProductionMode: productionMode,
 	}
 }

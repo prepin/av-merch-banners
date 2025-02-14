@@ -1,7 +1,6 @@
 package e2e
 
 import (
-	"fmt"
 	"net/http"
 )
 
@@ -118,8 +117,6 @@ func (s *E2ETestSuite) TestUserInteractions() {
 	s.Require().NoError(err)
 	s.Require().Equal(http.StatusOK, resp.StatusCode())
 	s.Assert().Equal(900, infoResponse.Coins, "Director should have 900 coins")
-	fmt.Println(resp)
-	fmt.Println(infoResponse)
 
 	var foundEmployee, foundEmployee2 bool
 	for _, sent := range infoResponse.CoinHistory.Sent {

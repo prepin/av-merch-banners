@@ -84,7 +84,7 @@ func (s *E2ETestSuite) TestSleepEndpoint() {
 			}
 
 			url := s.env.Server.URL + "/api/v1/sleep"
-			if len(tt.timeout) > 0 {
+			if tt.timeout != "" {
 				req.SetQueryParam("timeout", tt.timeout)
 			}
 

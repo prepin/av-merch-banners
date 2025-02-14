@@ -11,7 +11,7 @@ type mockAuthUseCase struct {
 	mock.Mock
 }
 
-func (m *mockAuthUseCase) SignIn(ctx context.Context, username string, password string) (string, error) {
+func (m *mockAuthUseCase) SignIn(ctx context.Context, username, password string) (string, error) {
 	args := m.Called(ctx, username, password)
 	return args.String(0), args.Error(1)
 }

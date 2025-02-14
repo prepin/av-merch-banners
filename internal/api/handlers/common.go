@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"errors"
+
 	"github.com/go-playground/validator/v10"
 )
 
@@ -14,7 +16,8 @@ var ServerErrorResponse = ErrorResponse{Error: "server error"}
 var UnauthorizedResponse = ErrorResponse{Error: "unauthorized"}
 
 func formatValidationError(err error) string {
-	if validationErrors, ok := err.(validator.ValidationErrors); ok {
+	var validationErrors validator.ValidationErrors
+	if errors.As(err, &validationErrors) {
 		for _, e := range validationErrors {
 			field := e.Field()
 			switch e.Tag() {

@@ -1,18 +1,18 @@
 package errs
 
-type ErrInternal struct {
+type InternalError struct {
 	Err error
 }
 
-func (err ErrInternal) Error() string {
+func (err InternalError) Error() string {
 	return err.Err.Error()
 }
 
-func (err ErrInternal) Unwrap() error {
+func (err InternalError) Unwrap() error {
 	return err.Err
 }
 
-func (err ErrInternal) Is(target error) bool {
-	_, ok := target.(ErrInternal)
+func (err InternalError) Is(target error) bool {
+	_, ok := target.(InternalError)
 	return ok
 }

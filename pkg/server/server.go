@@ -23,7 +23,7 @@ type Server struct {
 }
 
 func New(cfg *config.Config, handlers *handlers.Handlers) *Server {
-	if cfg.Server.ProductionMode == true {
+	if cfg.Server.ProductionMode {
 		gin.SetMode(gin.ReleaseMode)
 	}
 
@@ -69,7 +69,7 @@ func (s *Server) Shutdown() error {
 	defer cancel()
 
 	if err := s.httpServer.Shutdown(ctx); err != nil {
-		return fmt.Errorf("server shutdown failed: %v", err)
+		return fmt.Errorf("server shutdown failed: %w", err)
 	}
 
 	select {

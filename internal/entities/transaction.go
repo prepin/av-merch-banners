@@ -20,7 +20,7 @@ type Transaction struct {
 	CounterpartyID  int
 	Amount          int
 	TransactionType transactionType
-	ReferenceId     uuid.UUID `db:"transaction_reference_id"`
+	ReferenceID     uuid.UUID `db:"transaction_reference_id"`
 	CreatedAt       time.Time
 }
 
@@ -29,5 +29,5 @@ type TransactionData struct {
 	CounterpartyID  int
 	Amount          int
 	TransactionType transactionType
-	ReferenceId     uuid.UUID
+	ReferenceID     uuid.UUID
 }

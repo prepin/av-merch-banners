@@ -60,7 +60,7 @@ func (u *creditUseCase) Credit(
 			UserID:          user.ID,
 			Amount:          data.Amount,
 			TransactionType: entities.TransactionCredit,
-			ReferenceId:     uuid.New(),
+			ReferenceID:     uuid.New(),
 		})
 		if err != nil {
 			return err
@@ -75,6 +75,6 @@ func (u *creditUseCase) Credit(
 
 	return &entities.CreditTransactionResult{
 		NewAmount:   balance + data.Amount,
-		ReferenceID: tr.ReferenceId,
+		ReferenceID: tr.ReferenceID,
 	}, nil
 }

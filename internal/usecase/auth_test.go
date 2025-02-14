@@ -12,7 +12,7 @@ import (
 )
 
 func TestSignIn_Errors(t *testing.T) {
-	ctx := context.Background()
+	ctx := t.Context()
 
 	t.Run("transaction manager error", func(t *testing.T) {
 		tm := new(MockTransactionManager)
@@ -104,7 +104,7 @@ func TestSignIn_Errors(t *testing.T) {
 }
 
 func TestGetTokenForNewUser_TokenServiceError(t *testing.T) {
-	ctx := context.Background()
+	ctx := t.Context()
 	tm := new(MockTransactionManager)
 	ur := new(MockUserRepo)
 	tr := new(MockTransactionRepo)
@@ -128,7 +128,7 @@ func TestGetTokenForNewUser_TokenServiceError(t *testing.T) {
 	tm.On("Do", ctx, mock.AnythingOfType("func(context.Context) error")).
 		Run(func(args mock.Arguments) {
 			f := args.Get(1).(func(context.Context) error)
-			f(ctx)
+			_ = f(ctx)
 		}).
 		Return(expectedErr)
 
@@ -145,7 +145,7 @@ func TestGetTokenForNewUser_TokenServiceError(t *testing.T) {
 }
 
 func TestSignIn_CreditInitialAmountError(t *testing.T) {
-	ctx := context.Background()
+	ctx := t.Context()
 	tm := new(MockTransactionManager)
 	ur := new(MockUserRepo)
 	tr := new(MockTransactionRepo)
@@ -172,7 +172,7 @@ func TestSignIn_CreditInitialAmountError(t *testing.T) {
 	tm.On("Do", ctx, mock.AnythingOfType("func(context.Context) error")).
 		Run(func(args mock.Arguments) {
 			f := args.Get(1).(func(context.Context) error)
-			f(ctx)
+			_ = f(ctx)
 		}).
 		Return(expectedErr)
 

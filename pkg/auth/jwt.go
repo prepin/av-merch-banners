@@ -28,7 +28,7 @@ func NewJWTService(cfg *config.Config) *JWTService {
 	}
 }
 
-func (js *JWTService) GenerateToken(userID int, username string, role string) (string, error) {
+func (js *JWTService) GenerateToken(userID int, username, role string) (string, error) {
 	if string(js.secretKey) == "default" {
 		js.logger.Warn("JWT Secret key not set! Using default value. Provide secret key in AV_SECRET environment variable.")
 	}
@@ -50,8 +50,8 @@ func (js *JWTService) GenerateToken(userID int, username string, role string) (s
 func (js *JWTService) ValidateToken(tokenString string) (*Claims, error) {
 	token, err := jwt.ParseWithClaims(
 		tokenString, &Claims{},
-		func(token *jwt.Token,
-		) (interface{}, error) {
+		func(_ *jwt.Token,
+		) (any, error) {
 			return js.secretKey, nil
 		})
 

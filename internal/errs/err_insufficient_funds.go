@@ -1,31 +1,31 @@
 package errs
 
-type ErrInsufficientFunds struct {
+type InsufficientFundsError struct {
 	Err error
 }
 
-var ErrInsufficientFundsError = ErrInsufficientFunds{}
+var ErrInsufficientFundsError = InsufficientFundsError{}
 
-func (err ErrInsufficientFunds) Error() string {
+func (err InsufficientFundsError) Error() string {
 	return err.Err.Error()
 }
 
-func (err ErrInsufficientFunds) Is(target error) bool {
-	_, ok := target.(ErrInsufficientFunds)
+func (err InsufficientFundsError) Is(target error) bool {
+	_, ok := target.(InsufficientFundsError)
 	return ok
 }
 
-type ErrIncorrectAmount struct {
+type IncorrectAmountError struct {
 	Err error
 }
 
-var ErrIncorrectAmountError = ErrIncorrectAmount{}
+var ErrIncorrectAmountError = IncorrectAmountError{}
 
-func (err ErrIncorrectAmount) Error() string {
+func (err IncorrectAmountError) Error() string {
 	return err.Err.Error()
 }
 
-func (err ErrIncorrectAmount) Is(target error) bool {
-	_, ok := target.(ErrIncorrectAmount)
+func (err IncorrectAmountError) Is(target error) bool {
+	_, ok := target.(IncorrectAmountError)
 	return ok
 }

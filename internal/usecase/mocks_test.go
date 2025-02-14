@@ -116,7 +116,7 @@ type MockTokenService struct {
 	mock.Mock
 }
 
-func (m *MockTokenService) GenerateToken(userID int, username string, role string) (string, error) {
+func (m *MockTokenService) GenerateToken(userID int, username, role string) (string, error) {
 	args := m.Called(userID, username, role)
 	return args.String(0), args.Error(1)
 }
@@ -130,7 +130,7 @@ func (m *MockHashService) HashPassword(password string) (string, error) {
 	return args.String(0), args.Error(1)
 }
 
-func (m *MockHashService) CompareWithPassword(hashed string, password string) bool {
+func (m *MockHashService) CompareWithPassword(hashed, password string) bool {
 	args := m.Called(hashed, password)
 	return args.Bool(0)
 }

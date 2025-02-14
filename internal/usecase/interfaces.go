@@ -23,21 +23,21 @@ type TransactionManager interface {
 }
 
 type UserRepo interface {
-	GetByID(ctx context.Context, userId int) (*entities.User, error)
+	GetByID(ctx context.Context, userID int) (*entities.User, error)
 	GetByUsername(ctx context.Context, username string) (*entities.User, error)
 	Create(ctx context.Context, data entities.UserData) (*entities.User, error)
 }
 
 type TransactionRepo interface {
-	GetUserBalance(ctx context.Context, userId int) (int, error)
-	GetIncomingForUser(ctx context.Context, userId int) (*entities.UserReceived, error)
-	GetOutgoingForUser(ctx context.Context, userId int) (*entities.UserSent, error)
+	GetUserBalance(ctx context.Context, userID int) (int, error)
+	GetIncomingForUser(ctx context.Context, userID int) (*entities.UserReceived, error)
+	GetOutgoingForUser(ctx context.Context, userID int) (*entities.UserSent, error)
 	Create(ctx context.Context, data entities.TransactionData) (*entities.Transaction, error)
 }
 
 type OrderRepo interface {
 	Create(ctx context.Context, data entities.OrderData) (*entities.Order, error)
-	GetUserInventory(ctx context.Context, userId int) (*entities.UserInventory, error)
+	GetUserInventory(ctx context.Context, userID int) (*entities.UserInventory, error)
 }
 
 type ItemRepo interface {

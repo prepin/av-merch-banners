@@ -27,9 +27,9 @@ func NewOrderHandler(l *slog.Logger, u usecase.OrderUseCase) *OrderHandler {
 	}
 }
 
-// Оформляет заказ на вещь для текущего пользователя
+// Оформляет заказ на вещь для текущего пользователя.
 func (h *OrderHandler) PostOrder(c *gin.Context) {
-	if c.Request.Method != "POST" {
+	if c.Request.Method != http.MethodPost {
 		c.Header("Deprecation", "true")
 	}
 

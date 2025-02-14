@@ -33,7 +33,7 @@ func NewAuthUsecase(tm TransactionManager, ur UserRepo, tr TransactionRepo, ts T
 	}
 }
 
-func (u *authUseCase) SignIn(ctx context.Context, username string, password string) (string, error) {
+func (u *authUseCase) SignIn(ctx context.Context, username, password string) (string, error) {
 	var token string
 
 	err := u.transactionManager.Do(ctx, func(ctx context.Context) error {
@@ -108,7 +108,7 @@ func (u *authUseCase) creditInitialAmount(ctx context.Context, userID int) error
 		UserID:          userID,
 		Amount:          DefaultBalanceForUser,
 		TransactionType: entities.TransactionCredit,
-		ReferenceId:     uuid.New(),
+		ReferenceID:     uuid.New(),
 	})
 	return err
 }

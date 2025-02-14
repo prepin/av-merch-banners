@@ -1,16 +1,16 @@
 package errs
 
-type ErrNoAccess struct {
+type NoAccessError struct {
 	Err error
 }
 
-var ErrNoAccessError = ErrNoAccess{}
+var ErrNoAccessError = NoAccessError{}
 
-func (err ErrNoAccess) Error() string {
+func (err NoAccessError) Error() string {
 	return err.Err.Error()
 }
 
-func (err ErrNoAccess) Is(target error) bool {
-	_, ok := target.(ErrNotFound)
+func (err NoAccessError) Is(target error) bool {
+	_, ok := target.(NotFoundError)
 	return ok
 }

@@ -11,7 +11,7 @@ import (
 )
 
 func TestBuy_Errors(t *testing.T) {
-	ctx := context.Background()
+	ctx := t.Context()
 
 	t.Run("item repo error", func(t *testing.T) {
 		tm := new(MockTransactionManager)

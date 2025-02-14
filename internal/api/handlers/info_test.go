@@ -21,7 +21,7 @@ func TestGetInfo(t *testing.T) {
 		gin.SetMode(gin.TestMode)
 		w := httptest.NewRecorder()
 		c, _ := gin.CreateTestContext(w)
-		c.Request = httptest.NewRequest(http.MethodGet, "/info", nil)
+		c.Request = httptest.NewRequest(http.MethodGet, "/info", http.NoBody)
 		c.Set("userID", "not an int")
 
 		handler.GetInfo(c)
@@ -34,7 +34,7 @@ func TestGetInfo(t *testing.T) {
 		gin.SetMode(gin.TestMode)
 		w := httptest.NewRecorder()
 		c, _ := gin.CreateTestContext(w)
-		c.Request = httptest.NewRequest(http.MethodGet, "/info", nil)
+		c.Request = httptest.NewRequest(http.MethodGet, "/info", http.NoBody)
 		c.Set("userID", 1)
 
 		mockUseCase.On("GetInfo", mock.Anything, 1).
@@ -50,7 +50,7 @@ func TestGetInfo(t *testing.T) {
 		gin.SetMode(gin.TestMode)
 		w := httptest.NewRecorder()
 		c, _ := gin.CreateTestContext(w)
-		c.Request = httptest.NewRequest(http.MethodGet, "/info", nil)
+		c.Request = httptest.NewRequest(http.MethodGet, "/info", http.NoBody)
 
 		handler.GetInfo(c)
 

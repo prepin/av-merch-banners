@@ -1,3 +1,4 @@
+//nolint:tagliatelle // ТЗ требует несовместимые с линтером вещи
 package e2e
 
 import (
@@ -69,7 +70,7 @@ func (s *E2ETestSuite) TestUserInteractions() {
 			SetResult(&tokenResponse).
 			SetError(&errorResponse)
 
-		resp, err := authReq.Post(s.env.Server.URL + authUrl)
+		resp, err := authReq.Post(s.env.Server.URL + authURL)
 		s.Require().NoError(err, "Failed to get token for "+role)
 		s.Require().Equal(http.StatusOK, resp.StatusCode(), "Failed to get token for "+role)
 		tokens[role] = tokenResponse.Token

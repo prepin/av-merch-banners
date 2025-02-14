@@ -24,7 +24,7 @@ type CreditParams struct {
 
 type CreditResponse struct {
 	NewAmount   int       `json:"new_amount"`
-	ReferenceId uuid.UUID `json:"reference_id"`
+	ReferenceID uuid.UUID `json:"reference_id"`
 }
 
 func NewCreditHandler(l *slog.Logger, u usecase.CreditUseCase) *CreditHandler {
@@ -51,7 +51,7 @@ func (h *CreditHandler) PostCredit(c *gin.Context) {
 	})
 
 	if err != nil {
-		if errors.Is(err, errs.ErrNotFound{}) {
+		if errors.Is(err, errs.NotFoundError{}) {
 			c.JSON(http.StatusNotFound, ErrorResponse{Error: "user not exists"})
 			return
 		}
@@ -62,6 +62,6 @@ func (h *CreditHandler) PostCredit(c *gin.Context) {
 
 	c.JSON(http.StatusCreated, CreditResponse{
 		NewAmount:   tr.NewAmount,
-		ReferenceId: tr.ReferenceID,
+		ReferenceID: tr.ReferenceID,
 	})
 }

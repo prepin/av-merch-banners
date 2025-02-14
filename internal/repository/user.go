@@ -36,38 +36,47 @@ func (r *PGUserRepo) GetByUsername(ctx context.Context, username string) (*entit
 
 	query, args := stmt.MustBuild(ctx)
 
-	row, _ := r.db.Conn(ctx).Query(ctx, query, args...)
-	user, err := pgx.CollectOneRow(row, pgx.RowToStructByName[entities.User])
+	row, err := r.db.Conn(ctx).Query(ctx, query, args...)
+	if err != nil {
+		r.logger.Error("Failed query user", "error", errs.InternalError{Err: err})
+		return nil, err
+	}
 
+	user, err := pgx.CollectOneRow(row, pgx.RowToStructByName[entities.User])
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, errs.ErrNotFound{Err: err}
+			return nil, errs.NotFoundError{Err: err}
 		}
-		r.logger.Error("Failed query user", "error", errs.ErrInternal{Err: err})
+		r.logger.Error("Failed query user", "error", errs.InternalError{Err: err})
 		return nil, err
 	}
 
 	return &user, nil
 }
 
-func (r *PGUserRepo) GetByID(ctx context.Context, userId int) (*entities.User, error) {
+func (r *PGUserRepo) GetByID(ctx context.Context, userID int) (*entities.User, error) {
 
 	stmt := psql.Select(
 		sm.From("users"),
-		sm.Where(psql.Quote("id").EQ(psql.Arg(userId))),
+		sm.Where(psql.Quote("id").EQ(psql.Arg(userID))),
 		sm.Limit(1),
 	)
 
 	query, args := stmt.MustBuild(ctx)
 
-	row, _ := r.db.Conn(ctx).Query(ctx, query, args...)
+	row, err := r.db.Conn(ctx).Query(ctx, query, args...)
+	if err != nil {
+		r.logger.Error("Failed query user", "error", errs.InternalError{Err: err})
+		return nil, err
+	}
+
 	user, err := pgx.CollectOneRow(row, pgx.RowToStructByName[entities.User])
 
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, errs.ErrNotFound{Err: err}
+			return nil, errs.NotFoundError{Err: err}
 		}
-		r.logger.Error("Failed query user", "error", errs.ErrInternal{Err: err})
+		r.logger.Error("Failed query user", "error", errs.InternalError{Err: err})
 		return nil, err
 	}
 
@@ -86,14 +95,19 @@ func (r *PGUserRepo) Create(ctx context.Context, data entities.UserData) (*entit
 	)
 
 	query, args := stmt.MustBuild(ctx)
-	row, _ := r.db.Conn(ctx).Query(ctx, query, args...)
+	row, err := r.db.Conn(ctx).Query(ctx, query, args...)
+	if err != nil {
+		r.logger.Error("Failed query user", "error", errs.InternalError{Err: err})
+		return nil, err
+	}
+
 	user, err := pgx.CollectOneRow(row, pgx.RowToStructByName[entities.User])
 
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, errs.ErrNotFound{Err: err}
+			return nil, errs.NotFoundError{Err: err}
 		}
-		r.logger.Error("Failed query user", "error", errs.ErrInternal{Err: err})
+		r.logger.Error("Failed query user", "error", errs.InternalError{Err: err})
 		return nil, err
 	}
 

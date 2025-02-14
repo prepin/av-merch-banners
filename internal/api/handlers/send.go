@@ -16,6 +16,7 @@ type SendCoinHandler struct {
 	usecase usecase.SendCoinUseCase
 }
 
+//nolint:tagliatelle // allowing camelCase for this field
 type SendCoinParams struct {
 	ToUser string `json:"toUser" binding:"required"`
 	Amount int    `json:"amount" binding:"required"`
@@ -28,7 +29,7 @@ func NewSendCoinHandler(l *slog.Logger, u usecase.SendCoinUseCase) *SendCoinHand
 	}
 }
 
-// Отправляет монеты другому пользователю
+// Отправляет монеты другому пользователю.
 func (h *SendCoinHandler) PostSendCoin(c *gin.Context) {
 	var params *SendCoinParams
 

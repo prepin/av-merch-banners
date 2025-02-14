@@ -24,9 +24,9 @@ type TestEnv struct {
 	JWT        *auth.JWTService
 }
 
-// Возвращает Окружение, функцию остановки тест-контейнера, функцию загрузки сидов,
-// функцию очистки сидов
-func SetupTestEnv(t *testing.T) (*TestEnv, func(), func(), func()) {
+// Возвращает Окружение, функцию остановки тест-контейнера,
+// функцию загрузки сидов, функцию очистки сидов.
+func CreateTestEnv(t *testing.T) (env *TestEnv, cleanup, loadSeeds, dropSeeds func()) {
 	t.Helper()
 
 	testDB, err := testdb.NewTestDatabase()
@@ -80,7 +80,7 @@ func SetupTestEnv(t *testing.T) (*TestEnv, func(), func(), func()) {
 
 	testServer := httptest.NewServer(router)
 
-	env := &TestEnv{
+	env = &TestEnv{
 		Config:     cfg,
 		App:        application,
 		Server:     testServer,
@@ -89,7 +89,7 @@ func SetupTestEnv(t *testing.T) (*TestEnv, func(), func(), func()) {
 		JWT:        jwtService,
 	}
 
-	cleanup := func() {
+	cleanup = func() {
 		testServer.Close()
 		db.Close()
 		testDB.TerminateDB()

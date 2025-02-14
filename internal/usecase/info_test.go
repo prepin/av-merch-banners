@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"av-merch-shop/internal/entities"
-	"context"
 	"errors"
 	"testing"
 
@@ -10,7 +9,7 @@ import (
 )
 
 func TestGetInfo_AllErrors(t *testing.T) {
-	ctx := context.Background()
+	ctx := t.Context()
 
 	t.Run("get inventory error", func(t *testing.T) {
 		ur := new(MockUserRepo)

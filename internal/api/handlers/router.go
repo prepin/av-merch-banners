@@ -1,3 +1,4 @@
+//nolint:gocritic // в этом файле используем блоки для группировки роутов визуально
 package handlers
 
 import (
@@ -41,7 +42,7 @@ func (h *Handlers) RegisterRoutes(r *gin.Engine, jwtService *auth.JWTService) {
 	h.configureFieldValidator()
 
 	api := r.Group("/api")
-	api_v1 := r.Group("/api/v1")
+	apiV1 := r.Group("/api/v1")
 
 	registerRoutes := func(groups ...*gin.RouterGroup) {
 		for _, g := range groups {
@@ -59,9 +60,8 @@ func (h *Handlers) RegisterRoutes(r *gin.Engine, jwtService *auth.JWTService) {
 				timeout.WithGinCtxCallBack(func(c *gin.Context) {
 					h.config.Logger.Warn("Timeout", "url", c.Request.URL.String())
 				})))
-
-			// healthcheck эндпойнты
 			{
+				// healthcheck эндпойнты
 				timed.GET("/ping", GetPingHandler)
 				timed.GET("/teapot", GetTeapotHandler)
 				timed.GET("/sleep", GetSleepHandler)
@@ -97,7 +97,7 @@ func (h *Handlers) RegisterRoutes(r *gin.Engine, jwtService *auth.JWTService) {
 		}
 	}
 
-	registerRoutes(api, api_v1)
+	registerRoutes(api, apiV1)
 }
 
 // Конфигурим валидатор Джина для того, чтобы он брал имя поля из тегов структуры, а не

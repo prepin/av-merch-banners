@@ -25,7 +25,7 @@ func TestPostAuth(t *testing.T) {
 		c, _ := gin.CreateTestContext(w)
 
 		body := strings.NewReader(`{"username": "test", "password": "test"}`)
-		c.Request = httptest.NewRequest("POST", "/auth", body)
+		c.Request = httptest.NewRequest(http.MethodPost, "/auth", body)
 		c.Request.Header.Set("Content-Type", "application/json")
 
 		mockUseCase.On("SignIn", mock.Anything, "test", "test").
@@ -43,11 +43,11 @@ func TestPostAuth(t *testing.T) {
 		c, _ := gin.CreateTestContext(w)
 
 		body := strings.NewReader(`{"username": "test", "password": "wrong"}`)
-		c.Request = httptest.NewRequest("POST", "/auth", body)
+		c.Request = httptest.NewRequest(http.MethodPost, "/auth", body)
 		c.Request.Header.Set("Content-Type", "application/json")
 
 		mockUseCase.On("SignIn", mock.Anything, "test", "wrong").
-			Return("", errs.ErrNoAccess{})
+			Return("", errs.NoAccessError{})
 
 		handler.PostAuth(c)
 

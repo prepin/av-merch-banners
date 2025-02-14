@@ -1,3 +1,4 @@
+//nolint:tagliatelle // ТЗ требует иной формат JSON полей
 package e2e
 
 import "net/http"
@@ -14,7 +15,7 @@ func (s *E2ETestSuite) TestSendCoin() {
 		SetResult(&tokenResponse).
 		SetError(&errorResponse)
 
-	resp, err := authReq.Post(s.env.Server.URL + authUrl)
+	resp, err := authReq.Post(s.env.Server.URL + authURL)
 	s.Require().NoError(err, "Failed to get employee token")
 	s.Require().Equal(http.StatusOK, resp.StatusCode(), "Failed to get employee token")
 	employeeToken := tokenResponse.Token
@@ -119,7 +120,7 @@ func (s *E2ETestSuite) TestSendCoin() {
 				req.SetHeader("Authorization", "Bearer "+tt.token)
 			}
 
-			resp, err := req.Post(s.env.Server.URL + sendCoinUrl)
+			resp, err := req.Post(s.env.Server.URL + sendCoinURL)
 			s.Require().NoError(err, "Failed to make request")
 
 			s.Assert().Equal(tt.expectedCode, resp.StatusCode(), "Expected status code mismatch")

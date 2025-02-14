@@ -15,7 +15,7 @@ type AuthHandler struct {
 	usecase usecase.AuthUseCase
 }
 
-// 72 символа — это ограничение bcrypt, остальное в любом случае отбросится
+// 72 символа — это ограничение bcrypt, остальное в любом случае отбросится.
 type AuthPostParams struct {
 	Username string `json:"username" binding:"required,max=200"`
 	Password string `json:"password" binding:"required,max=72"`
@@ -45,7 +45,7 @@ func (h *AuthHandler) PostAuth(c *gin.Context) {
 
 	token, err := h.usecase.SignIn(c.Request.Context(), params.Username, params.Password)
 	if err != nil {
-		if errors.Is(err, errs.ErrNoAccess{}) {
+		if errors.Is(err, errs.NoAccessError{}) {
 			c.JSON(http.StatusUnauthorized, ErrorResponse{Error: "wrong password"})
 			return
 		}

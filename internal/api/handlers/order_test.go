@@ -22,7 +22,7 @@ func TestPostOrder(t *testing.T) {
 		gin.SetMode(gin.TestMode)
 		w := httptest.NewRecorder()
 		c, _ := gin.CreateTestContext(w)
-		c.Request = httptest.NewRequest(http.MethodPost, "/buy/item1", nil)
+		c.Request = httptest.NewRequest(http.MethodPost, "/buy/item1", http.NoBody)
 		c.Set("userID", 1)
 		c.AddParam("item", "item1")
 
@@ -42,7 +42,7 @@ func TestPostOrder(t *testing.T) {
 		gin.SetMode(gin.TestMode)
 		w := httptest.NewRecorder()
 		c, _ := gin.CreateTestContext(w)
-		c.Request = httptest.NewRequest(http.MethodGet, "/buy/item1", nil)
+		c.Request = httptest.NewRequest(http.MethodGet, "/buy/item1", http.NoBody)
 		c.Set("userID", 1)
 		c.AddParam("item", "item1")
 
@@ -61,7 +61,7 @@ func TestPostOrder(t *testing.T) {
 		gin.SetMode(gin.TestMode)
 		w := httptest.NewRecorder()
 		c, _ := gin.CreateTestContext(w)
-		c.Request = httptest.NewRequest(http.MethodPost, "/buy/", nil)
+		c.Request = httptest.NewRequest(http.MethodPost, "/buy/", http.NoBody)
 		c.AddParam("item", "/")
 
 		handler.PostOrder(c)
@@ -74,7 +74,7 @@ func TestPostOrder(t *testing.T) {
 		gin.SetMode(gin.TestMode)
 		w := httptest.NewRecorder()
 		c, _ := gin.CreateTestContext(w)
-		c.Request = httptest.NewRequest(http.MethodPost, "/buy/item1", nil)
+		c.Request = httptest.NewRequest(http.MethodPost, "/buy/item1", http.NoBody)
 		c.AddParam("item", "item1")
 
 		handler.PostOrder(c)
@@ -86,7 +86,7 @@ func TestPostOrder(t *testing.T) {
 		gin.SetMode(gin.TestMode)
 		w := httptest.NewRecorder()
 		c, _ := gin.CreateTestContext(w)
-		c.Request = httptest.NewRequest(http.MethodPost, "/buy/item1", nil)
+		c.Request = httptest.NewRequest(http.MethodPost, "/buy/item1", http.NoBody)
 		c.Set("userID", "not an int")
 		c.AddParam("item", "item1")
 

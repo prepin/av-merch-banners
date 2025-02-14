@@ -60,7 +60,7 @@ func (u *sendCoinUseCase) Send(ctx context.Context, data *entities.TransferData)
 			CounterpartyID:  recipient.ID,
 			Amount:          -data.Amount,
 			TransactionType: entities.TransactionTransfer,
-			ReferenceId:     ref,
+			ReferenceID:     ref,
 		}
 
 		inTrData := entities.TransactionData{
@@ -68,7 +68,7 @@ func (u *sendCoinUseCase) Send(ctx context.Context, data *entities.TransferData)
 			CounterpartyID:  sender.ID,
 			Amount:          data.Amount,
 			TransactionType: entities.TransactionTransfer,
-			ReferenceId:     ref,
+			ReferenceID:     ref,
 		}
 
 		_, err = u.transactionRepo.Create(ctx, outTrData)

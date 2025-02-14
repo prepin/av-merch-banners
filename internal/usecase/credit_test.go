@@ -11,7 +11,7 @@ import (
 )
 
 func TestCredit_Errors(t *testing.T) {
-	ctx := context.Background()
+	ctx := t.Context()
 
 	t.Run("get user balance error", func(t *testing.T) {
 		tm := new(MockTransactionManager)
@@ -40,7 +40,7 @@ func TestCredit_Errors(t *testing.T) {
 }
 
 func TestCredit_CreateTransactionError(t *testing.T) {
-	ctx := context.Background()
+	ctx := t.Context()
 	tm := new(MockTransactionManager)
 	tr := new(MockTransactionRepo)
 	ur := new(MockUserRepo)

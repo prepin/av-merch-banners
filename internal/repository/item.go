@@ -25,7 +25,7 @@ func NewPGItemRepo(db *database.Database, logger *slog.Logger) *PGItemRepo {
 	}
 }
 
-// Возвращает товар по названию
+// Возвращает товар по названию.
 func (r *PGItemRepo) GetItemByName(ctx context.Context, itemName string) (*entities.Item, error) {
 
 	stmt := psql.Select(
@@ -37,14 +37,19 @@ func (r *PGItemRepo) GetItemByName(ctx context.Context, itemName string) (*entit
 
 	query, args := stmt.MustBuild(ctx)
 
-	row, _ := r.db.Conn(ctx).Query(ctx, query, args...)
+	row, err := r.db.Conn(ctx).Query(ctx, query, args...)
+	if err != nil {
+		r.logger.Error("Failed query item", "error", errs.InternalError{Err: err})
+		return nil, err
+	}
+
 	item, err := pgx.CollectOneRow(row, pgx.RowToStructByName[entities.Item])
 
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, errs.ErrNotFound{Err: err}
+			return nil, errs.NotFoundError{Err: err}
 		}
-		r.logger.Error("Failed query item", "error", errs.ErrInternal{Err: err})
+		r.logger.Error("Failed query item", "error", errs.InternalError{Err: err})
 		return nil, err
 	}
 

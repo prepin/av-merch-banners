@@ -14,7 +14,7 @@ func (s *E2ETestSuite) TestCreditPost() {
 		SetResult(&tokenResponse).
 		SetError(&errorResponse)
 
-	resp, err := authReq.Post(s.env.Server.URL + authUrl)
+	resp, err := authReq.Post(s.env.Server.URL + authURL)
 	s.Require().NoError(err, "Failed to get auth token")
 	s.Require().Equal(http.StatusOK, resp.StatusCode(), "Failed to get auth token")
 	directorToken := tokenResponse.Token
@@ -27,7 +27,7 @@ func (s *E2ETestSuite) TestCreditPost() {
 		SetResult(&tokenResponse).
 		SetError(&errorResponse)
 
-	resp, err = authReq.Post(s.env.Server.URL + authUrl)
+	resp, err = authReq.Post(s.env.Server.URL + authURL)
 	s.Require().NoError(err, "Failed to get employee token")
 	s.Require().Equal(http.StatusOK, resp.StatusCode(), "Failed to get employee token")
 	employeeToken := tokenResponse.Token

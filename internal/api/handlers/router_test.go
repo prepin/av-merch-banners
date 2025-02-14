@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/gin-gonic/gin"
@@ -15,7 +16,7 @@ func TestConfigureFieldValidator(t *testing.T) {
 		gin.SetMode(gin.TestMode)
 
 		type TestStruct struct {
-			JsonField  string `json:"json_field" binding:"required"`
+			JSONField  string `json:"json_field" binding:"required"`
 			FormField  string `form:"form_field" binding:"required"`
 			EmptyField string
 		}
@@ -26,7 +27,8 @@ func TestConfigureFieldValidator(t *testing.T) {
 			test := TestStruct{}
 			err := v.Struct(test)
 
-			if validationErrors, ok := err.(validator.ValidationErrors); ok {
+			var validationErrors validator.ValidationErrors
+			if errors.As(err, &validationErrors) {
 				for _, e := range validationErrors {
 					switch e.Field() {
 					case "json_field", "form_field":

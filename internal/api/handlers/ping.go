@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Для проверки, что сервер живой
+// Для проверки, что сервер живой.
 func GetPingHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"message": "pong",
@@ -23,7 +23,7 @@ func GetTeapotHandler(c *gin.Context) {
 	})
 }
 
-// Для тестирования отсечки слишком длинных запросов по таймауту
+// Для тестирования отсечки слишком длинных запросов по таймауту.
 func GetSleepHandler(c *gin.Context) {
 	sleepParam := c.DefaultQuery("timeout", "100")
 	sleep, err := strconv.Atoi(sleepParam)

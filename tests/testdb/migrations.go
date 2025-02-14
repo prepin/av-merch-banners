@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"runtime"
 
+	// Goose использует sql.Open интерфейс pgx.
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/pressly/goose/v3"
 )

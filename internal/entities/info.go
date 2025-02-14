@@ -1,3 +1,4 @@
+//nolint:tagliatelle // такой формат полей в ТЗ
 package entities
 
 type UserInfo struct {

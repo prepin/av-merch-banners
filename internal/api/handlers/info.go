@@ -20,7 +20,7 @@ func NewInfoHandler(l *slog.Logger, u usecase.InfoUseCase) *InfoHandler {
 	}
 }
 
-// возвращает инфу про текущего пользователя
+// Возвращает инфу про текущего пользователя.
 func (h *InfoHandler) GetInfo(c *gin.Context) {
 	userID, exists := c.Get("userID")
 	if !exists {

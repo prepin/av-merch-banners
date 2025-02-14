@@ -83,7 +83,7 @@ func (s *E2ETestSuite) TestAuthPost() {
 				SetResult(&tokenResponse).
 				SetError(&errorResponse)
 
-			resp, err := req.Post(s.env.Server.URL + authUrl)
+			resp, err := req.Post(s.env.Server.URL + authURL)
 			s.Require().NoError(err, "Failed to make request")
 
 			s.Assert().Equal(tt.expectedCode, resp.StatusCode(), "Expected status code mismatch")

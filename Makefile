@@ -40,10 +40,7 @@ clean:
 	docker compose down -v --rmi all --remove-orphans
 
 lint:
-	golangci-lint run ./...
-
-push: build
-	docker push $(APP_IMAGE):$(TAG)
+	golangci-lint run
 
 dev-deps:
 	go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest

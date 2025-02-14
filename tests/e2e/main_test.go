@@ -23,16 +23,16 @@ type E2ETestSuite struct {
 	client    *resty.Client
 }
 
-var authUrl = "/api/v1/auth"
-var sendCoinUrl = "/api/v1/sendCoin"
-var orderUrl = "/api/v1/buy/"
+var authURL = "/api/v1/auth"
+var sendCoinURL = "/api/v1/sendCoin"
+var orderURL = "/api/v1/buy/"
 
 type errorResponse struct {
 	Error string `json:"errors"`
 }
 
 func (s *E2ETestSuite) SetupTest() {
-	s.env, s.cleanup, s.loadData, s.cleanData = setup.SetupTestEnv(s.T())
+	s.env, s.cleanup, s.loadData, s.cleanData = setup.CreateTestEnv(s.T())
 	s.client = resty.New()
 }
 

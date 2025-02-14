@@ -17,6 +17,6 @@ type OrderRequest struct {
 
 type OrderData struct {
 	UserID        int
-	ItemId        int
-	TransactionId int
+	ItemID        int
+	TransactionID int
 }

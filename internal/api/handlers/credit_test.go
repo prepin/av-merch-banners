@@ -24,7 +24,7 @@ func TestPostCredit(t *testing.T) {
 		c, _ := gin.CreateTestContext(w)
 
 		body := strings.NewReader(`{"invalid": json}`)
-		c.Request = httptest.NewRequest("POST", "/credit", body)
+		c.Request = httptest.NewRequest(http.MethodPost, "/credit", body)
 		c.Request.Header.Set("Content-Type", "application/json")
 
 		handler.PostCredit(c)
@@ -38,7 +38,7 @@ func TestPostCredit(t *testing.T) {
 		c, _ := gin.CreateTestContext(w)
 
 		body := strings.NewReader(`{"username": "test", "amount": 100}`)
-		c.Request = httptest.NewRequest("POST", "/credit", body)
+		c.Request = httptest.NewRequest(http.MethodPost, "/credit", body)
 		c.Request.Header.Set("Content-Type", "application/json")
 
 		mockUseCase.On("Credit", mock.Anything, mock.AnythingOfType("*entities.CreditData")).

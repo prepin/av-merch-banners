@@ -48,7 +48,7 @@ func (u *orderUseCase) Buy(ctx context.Context, data *entities.OrderRequest) err
 			UserID:          data.UserID,
 			Amount:          item.Cost,
 			TransactionType: entities.TransactionOrder,
-			ReferenceId:     uuid.New(),
+			ReferenceID:     uuid.New(),
 		})
 		if err != nil {
 			return err
@@ -57,8 +57,8 @@ func (u *orderUseCase) Buy(ctx context.Context, data *entities.OrderRequest) err
 		// создаём заказ
 		_, err = u.orderRepo.Create(ctx, entities.OrderData{
 			UserID:        data.UserID,
-			ItemId:        item.ID,
-			TransactionId: trnsct.ID,
+			ItemID:        item.ID,
+			TransactionID: trnsct.ID,
 		})
 		if err != nil {
 			return err

@@ -12,7 +12,7 @@ import (
 )
 
 func TestSend_Errors(t *testing.T) {
-	ctx := context.Background()
+	ctx := t.Context()
 
 	t.Run("negative amount", func(t *testing.T) {
 		tm := new(MockTransactionManager)
@@ -173,7 +173,7 @@ func TestSend_Errors(t *testing.T) {
 	})
 }
 func TestSend_CreateSecondTransactionError(t *testing.T) {
-	ctx := context.Background()
+	ctx := t.Context()
 	tm := new(MockTransactionManager)
 	tr := new(MockTransactionRepo)
 	ur := new(MockUserRepo)

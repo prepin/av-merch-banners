@@ -19,7 +19,7 @@ func (s *E2ETestSuite) TestOrder() {
 		SetResult(&tokenResponse).
 		SetError(&errorResponse)
 
-	resp, err := authReq.Post(s.env.Server.URL + authUrl)
+	resp, err := authReq.Post(s.env.Server.URL + authURL)
 	s.Require().NoError(err, "Failed to get employee token")
 	s.Require().Equal(http.StatusOK, resp.StatusCode(), "Failed to get employee token")
 	employeeToken := tokenResponse.Token
@@ -77,7 +77,7 @@ func (s *E2ETestSuite) TestOrder() {
 					req.SetHeader("Authorization", "Bearer "+tt.token)
 				}
 
-				url := s.env.Server.URL + orderUrl + tt.itemName
+				url := s.env.Server.URL + orderURL + tt.itemName
 
 				var resp *resty.Response
 				var err error

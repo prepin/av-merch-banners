@@ -54,19 +54,23 @@ func NewTestDatabase() (*TestDatabase, error) {
 
 	host, err := container.Host(ctx)
 	if err != nil {
-		container.Terminate(ctx)
+		if termErr := container.Terminate(ctx); termErr != nil {
+			return nil, fmt.Errorf("failed to get container host: %w, failed to terminate container: %w", err, termErr)
+		}
 		return nil, fmt.Errorf("failed to get container host: %w", err)
 	}
 
 	mappedPort, err := container.MappedPort(ctx, "5432")
 	if err != nil {
-		container.Terminate(ctx)
+		if termErr := container.Terminate(ctx); termErr != nil {
+			return nil, fmt.Errorf("failed to get container port: %w, failed to terminate container: %w", err, termErr)
+		}
 		return nil, fmt.Errorf("failed to get container port: %w", err)
 	}
 
 	dbConfig := config.DBConfig{
 		Host:     host,
-		Port:     int(mappedPort.Int()),
+		Port:     mappedPort.Int(),
 		User:     dbUser,
 		Password: dbPassword,
 		DBName:   dbName,
@@ -89,6 +93,8 @@ func (td *TestDatabase) MigrateConnectionString() string {
 
 func (td *TestDatabase) TerminateDB() {
 	if td.container != nil {
-		td.container.Terminate(td.ctx)
+		if err := td.container.Terminate(td.ctx); err != nil {
+			log.Printf("failed to terminate container: %v", err)
+		}
 	}
 }

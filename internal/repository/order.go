@@ -31,48 +31,56 @@ func (r *PGOrderRepo) Create(ctx context.Context, data entities.OrderData) (*ent
 		im.Into("orders", "user_id", "item_id", "transaction_id"),
 		im.Values(
 			psql.Arg(data.UserID),
-			psql.Arg(data.ItemId),
-			psql.Arg(data.TransactionId),
+			psql.Arg(data.ItemID),
+			psql.Arg(data.TransactionID),
 		),
 		im.Returning("id", "user_id", "item_id", "transaction_id", "created_at"),
 	)
 
 	query, args := stmt.MustBuild(ctx)
 
-	row, _ := r.db.Conn(ctx).Query(ctx, query, args...)
+	row, err := r.db.Conn(ctx).Query(ctx, query, args...)
+	if err != nil {
+		r.logger.Error("Failed create user", "error", errs.InternalError{Err: err})
+		return nil, err
+	}
 
 	order, err := pgx.CollectOneRow(row, pgx.RowToStructByName[entities.Order])
 
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, errs.ErrNotFound{Err: err}
+			return nil, errs.NotFoundError{Err: err}
 		}
-		r.logger.Error("Failed create user", "error", errs.ErrInternal{Err: err})
+		r.logger.Error("Failed create user", "error", errs.InternalError{Err: err})
 		return nil, err
 	}
 
 	return &order, nil
 }
 
-func (r *PGOrderRepo) GetUserInventory(ctx context.Context, userId int) (*entities.UserInventory, error) {
+func (r *PGOrderRepo) GetUserInventory(ctx context.Context, userID int) (*entities.UserInventory, error) {
 	stmt := psql.Select(
 		sm.Columns("i.codename", psql.Raw("count(o.id) as quantity")),
 		sm.From("orders").As("o"),
 		sm.InnerJoin("items").As("i").On(psql.Raw("o.item_id=i.id")),
-		sm.Where(psql.Quote("user_id").EQ(psql.Arg(userId))),
+		sm.Where(psql.Quote("user_id").EQ(psql.Arg(userID))),
 		sm.GroupBy("item_id, i.codename"),
 	)
 	query, args := stmt.MustBuild(ctx)
 
-	rows, _ := r.db.Conn(ctx).Query(ctx, query, args...)
+	rows, err := r.db.Conn(ctx).Query(ctx, query, args...)
+	if err != nil {
+		r.logger.Error("Failed query user", "error", errs.InternalError{Err: err})
+		return nil, err
+	}
 
 	inventory, err := pgx.CollectRows(rows, pgx.RowToStructByName[entities.UserInventoryItem])
 
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, errs.ErrNotFound{Err: err}
+			return nil, errs.NotFoundError{Err: err}
 		}
-		r.logger.Error("Failed query user", "error", errs.ErrInternal{Err: err})
+		r.logger.Error("Failed query user", "error", errs.InternalError{Err: err})
 		return nil, err
 	}
 

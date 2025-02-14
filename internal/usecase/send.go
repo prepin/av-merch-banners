@@ -52,10 +52,11 @@ func (u *SendCoinUseCase) Send(ctx context.Context, data *entities.TransferData)
 		// создать две записи в транзакцию
 		ref := uuid.New()
 		outTrData := entities.TransactionData{
-			UserID:         sender.ID,
-			CounterpartyID: recipient.ID,
-			Amount:         -data.Amount,
-			ReferenceId:    ref,
+			UserID:          sender.ID,
+			CounterpartyID:  recipient.ID,
+			Amount:          -data.Amount,
+			TransactionType: entities.TransactionTransfer,
+			ReferenceId:     ref,
 		}
 
 		inTrData := entities.TransactionData{

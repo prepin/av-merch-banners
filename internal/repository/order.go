@@ -6,7 +6,6 @@ import (
 	"av-merch-shop/pkg/database"
 	"context"
 	"errors"
-	"fmt"
 	"log/slog"
 
 	"github.com/jackc/pgx/v5"
@@ -68,7 +67,6 @@ func (r *PGOrderRepo) GetUserInventory(ctx context.Context, userId int) (*entiti
 	rows, _ := r.db.Conn(ctx).Query(ctx, query, args...)
 
 	inventory, err := pgx.CollectRows(rows, pgx.RowToStructByName[entities.UserInventoryItem])
-	fmt.Println(inventory, err)
 
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {

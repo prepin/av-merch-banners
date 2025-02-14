@@ -3,7 +3,6 @@ package usecase
 import (
 	"av-merch-shop/internal/entities"
 	"context"
-	"fmt"
 )
 
 type InfoUseCase struct {
@@ -21,7 +20,6 @@ func NewInfoUseCase(ur UserRepo, tr TransactionRepo, or OrderRepo) *InfoUseCase 
 }
 
 func (u *InfoUseCase) GetInfo(ctx context.Context, userID int) (*entities.UserInfo, error) {
-	fmt.Println("Info for", userID)
 
 	user, err := u.userRepo.GetByID(ctx, userID)
 	if err != nil {

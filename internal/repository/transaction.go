@@ -7,7 +7,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"fmt"
 	"log/slog"
 
 	"github.com/jackc/pgx/v5"
@@ -115,7 +114,6 @@ func (r *PGTransactionRepo) GetOutgoingForUser(ctx context.Context, userId int) 
 		sm.GroupBy("u.username"),
 	)
 	query, args := stmt.MustBuild(ctx)
-	fmt.Println(query, args)
 
 	rows, _ := r.db.Conn(ctx).Query(ctx, query, args...)
 
@@ -144,7 +142,6 @@ func (r *PGTransactionRepo) GetIncomingForUser(ctx context.Context, userId int) 
 		sm.GroupBy("u.username"),
 	)
 	query, args := stmt.MustBuild(ctx)
-	fmt.Println(query, args)
 
 	rows, _ := r.db.Conn(ctx).Query(ctx, query, args...)
 

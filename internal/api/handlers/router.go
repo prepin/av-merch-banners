@@ -5,12 +5,15 @@ import (
 	"av-merch-shop/internal/api/middleware"
 	"av-merch-shop/internal/usecase"
 	"av-merch-shop/pkg/auth"
+	"net/http"
 	"reflect"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/validator/v10"
+	timeout "github.com/vearne/gin-timeout"
 )
 
 type Handlers struct {
@@ -42,23 +45,29 @@ func (h *Handlers) RegisterRoutes(r *gin.Engine, jwtService *auth.JWTService) {
 
 	registerRoutes := func(groups ...*gin.RouterGroup) {
 		for _, g := range groups {
-			// g.Use(
-			// 	middleware.TimeoutMiddleware(
-			// 		time.Duration(h.config.Server.RequestTimeout) * time.Millisecond,
-			// 	),
-			// )
-
-			// healthcheck эндпойнты
-			{
-				g.GET("/ping", GetPingHandler)
-				g.GET("/teapot", GetTeapotHandler)
-				g.GET("/sleep", GetSleepHandler)
-			}
 
 			// авторизация (и автосоздание юзера)
 			g.POST("/auth", h.Auth.PostAuth)
 
-			protected := g.Group("")
+			timed := g.Group("")
+
+			timeoutMsg := `{"error":"timeout"}`
+			timed.Use(timeout.Timeout(
+				timeout.WithTimeout(time.Duration(h.config.Server.RequestTimeout)*time.Millisecond),
+				timeout.WithErrorHttpCode(http.StatusRequestTimeout),
+				timeout.WithDefaultMsg(timeoutMsg),
+				timeout.WithGinCtxCallBack(func(c *gin.Context) {
+					h.config.Logger.Warn("Timeout", "url", c.Request.URL.String())
+				})))
+
+			// healthcheck эндпойнты
+			{
+				timed.GET("/ping", GetPingHandler)
+				timed.GET("/teapot", GetTeapotHandler)
+				timed.GET("/sleep", GetSleepHandler)
+			}
+
+			protected := timed.Group("")
 			protected.Use(middleware.AuthMiddleware(jwtService))
 			{
 				// отправка монет другому пользователю

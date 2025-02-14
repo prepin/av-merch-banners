@@ -6,7 +6,6 @@ require (
 	github.com/avito-tech/go-transaction-manager/drivers/pgxv5/v2 v2.0.0
 	github.com/avito-tech/go-transaction-manager/trm/v2 v2.0.0-rc10
 	github.com/gin-contrib/cors v1.7.3
-	github.com/gin-contrib/timeout v1.0.2
 	github.com/gin-gonic/gin v1.10.0
 	github.com/go-playground/validator/v10 v10.23.0
 	github.com/go-resty/resty/v2 v2.16.5
@@ -18,6 +17,7 @@ require (
 	github.com/stephenafamo/bob v0.30.0
 	github.com/stretchr/testify v1.10.0
 	github.com/testcontainers/testcontainers-go v0.35.0
+	github.com/vearne/gin-timeout v0.2.0
 	golang.org/x/crypto v0.32.0
 )
 

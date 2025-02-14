@@ -11,7 +11,6 @@ func (s *E2ETestSuite) TestOrder() {
 	var tokenResponse tokenResponse
 	var errorResponse errorResponse
 
-	// Get employee token for authentication
 	authReq := s.client.R().
 		SetBody(AuthRequest{
 			Username: "employee",

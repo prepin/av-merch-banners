@@ -57,6 +57,7 @@ func (h *CreditHandler) PostCredit(c *gin.Context) {
 		}
 		h.logger.Error("Crediting user failed", "error", err)
 		c.JSON(http.StatusInternalServerError, ServerErrorResponse)
+		return
 	}
 
 	c.JSON(http.StatusCreated, CreditResponse{

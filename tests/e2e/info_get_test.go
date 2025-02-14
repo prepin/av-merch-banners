@@ -37,7 +37,6 @@ func (s *E2ETestSuite) TestUserInteractions() {
 	var errorResponse errorResponse
 	var infoResponse UserInfo
 
-	// Get tokens for all users
 	tokens := make(map[string]string)
 	users := map[string]struct {
 		username string
@@ -63,7 +62,6 @@ func (s *E2ETestSuite) TestUserInteractions() {
 		tokens[role] = tokenResponse.Token
 	}
 
-	// Check initial employee2 balance
 	req := s.client.R().
 		SetHeader("Authorization", "Bearer "+tokens["employee2"]).
 		SetResult(&infoResponse).
@@ -74,7 +72,6 @@ func (s *E2ETestSuite) TestUserInteractions() {
 	s.Require().Equal(http.StatusOK, resp.StatusCode())
 	s.Assert().Equal(1000, infoResponse.Coins, "Employee2 should start with 1000 coins")
 
-	// Director sends coins
 	type SendCoinRequest struct {
 		ToUser string `json:"toUser"`
 		Amount int    `json:"amount"`
@@ -94,12 +91,10 @@ func (s *E2ETestSuite) TestUserInteractions() {
 		s.Require().Equal(http.StatusOK, resp.StatusCode())
 	}
 
-	// Director sends coins
 	sendCoins(tokens["director"], "employee", 50)
 	sendCoins(tokens["director"], "employee", 10)
 	sendCoins(tokens["director"], "employee2", 40)
 
-	// Check director's balance and history
 	req = s.client.R().
 		SetHeader("Authorization", "Bearer "+tokens["director"]).
 		SetResult(&infoResponse).
@@ -112,7 +107,6 @@ func (s *E2ETestSuite) TestUserInteractions() {
 	fmt.Println(resp)
 	fmt.Println(infoResponse)
 
-	// Verify director's sent history
 	var foundEmployee, foundEmployee2 bool
 	for _, sent := range infoResponse.CoinHistory.Sent {
 		if sent.ToUser == "employee" && sent.Amount == 60 {
@@ -125,11 +119,9 @@ func (s *E2ETestSuite) TestUserInteractions() {
 	s.Assert().True(foundEmployee, "Should find 60 coins sent to employee")
 	s.Assert().True(foundEmployee2, "Should find 40 coins sent to employee2")
 
-	// Employee sends coins
 	sendCoins(tokens["employee"], "director", 100)
 	sendCoins(tokens["employee"], "employee2", 50)
 
-	// Employee buys items
 	buyItem := func(token, item string) {
 		req := s.client.R().
 			SetHeader("Authorization", "Bearer "+token).
@@ -144,7 +136,6 @@ func (s *E2ETestSuite) TestUserInteractions() {
 	buyItem(tokens["employee"], "t-shirt")
 	buyItem(tokens["employee"], "socks")
 
-	// Check employee's final state
 	req = s.client.R().
 		SetHeader("Authorization", "Bearer "+tokens["employee"]).
 		SetResult(&infoResponse).
@@ -154,7 +145,6 @@ func (s *E2ETestSuite) TestUserInteractions() {
 	s.Require().NoError(err)
 	s.Require().Equal(http.StatusOK, resp.StatusCode())
 
-	// Verify employee's inventory
 	var tShirtCount, socksCount int
 	for _, item := range infoResponse.Inventory {
 		if item.Type == "t-shirt" {
@@ -167,7 +157,6 @@ func (s *E2ETestSuite) TestUserInteractions() {
 	s.Assert().Equal(2, tShirtCount, "Should have 2 t-shirts")
 	s.Assert().Equal(1, socksCount, "Should have 1 socks")
 
-	// Verify employee's received coins
 	var receivedFromDirector int
 	for _, received := range infoResponse.CoinHistory.Received {
 		if received.FromUser == "director" {
@@ -176,7 +165,6 @@ func (s *E2ETestSuite) TestUserInteractions() {
 	}
 	s.Assert().Equal(60, receivedFromDirector, "Should have received 60 coins from director")
 
-	// Check employee2's final state
 	req = s.client.R().
 		SetHeader("Authorization", "Bearer "+tokens["employee2"]).
 		SetResult(&infoResponse).
@@ -186,7 +174,6 @@ func (s *E2ETestSuite) TestUserInteractions() {
 	s.Require().NoError(err)
 	s.Require().Equal(http.StatusOK, resp.StatusCode())
 
-	// Verify employee2's received coins
 	var receivedFromEmployee, receivedFromDirectorE2 int
 	for _, received := range infoResponse.CoinHistory.Received {
 		if received.FromUser == "employee" {

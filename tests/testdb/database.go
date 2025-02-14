@@ -4,8 +4,6 @@ import (
 	"av-merch-shop/config"
 	"context"
 	"fmt"
-	"io"
-	"log"
 
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
@@ -26,8 +24,8 @@ func NewTestDatabase() (*TestDatabase, error) {
 		dbName     = "testdb"
 	)
 
-	// turn off excessive logging for test containers
-	testcontainers.Logger = log.New(io.Discard, "", 0)
+	// убираем излишнее логирование, а то тест
+	// testcontainers.Logger = log.New(io.Discard, "", 0)
 
 	req := testcontainers.ContainerRequest{
 		Image:        "postgres:17",
@@ -84,7 +82,6 @@ func (td *TestDatabase) ConnectionString() string {
 }
 
 func (td *TestDatabase) MigrateConnectionString() string {
-	// Use postgresql:// for migrations
 	return "postgresql://" + td.ConnectionString()[len("postgres://"):]
 }
 

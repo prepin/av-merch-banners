@@ -23,6 +23,10 @@ type Server struct {
 }
 
 func New(cfg *config.Config, handlers *handlers.Handlers) *Server {
+	if cfg.Server.ProductionMode == true {
+		gin.SetMode(gin.ReleaseMode)
+	}
+
 	router := gin.Default()
 	jwtService := auth.NewJWTService(cfg)
 

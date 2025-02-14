@@ -15,9 +15,10 @@ type AuthHandler struct {
 	usecase usecase.AuthUseCase
 }
 
+// 72 символа — это ограничение bcrypt, остальное в любом случае отбросится
 type AuthPostParams struct {
-	Username string `json:"username" binding:"required"`
-	Password string `json:"password" binding:"required"`
+	Username string `json:"username" binding:"required,max=200"`
+	Password string `json:"password" binding:"required,max=72"`
 }
 
 type AuthTokenResponse struct {

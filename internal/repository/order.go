@@ -6,11 +6,13 @@ import (
 	"av-merch-shop/pkg/database"
 	"context"
 	"errors"
+	"fmt"
 	"log/slog"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/stephenafamo/bob/dialect/psql"
 	"github.com/stephenafamo/bob/dialect/psql/im"
+	"github.com/stephenafamo/bob/dialect/psql/sm"
 )
 
 type PGOrderRepo struct {
@@ -51,4 +53,31 @@ func (r *PGOrderRepo) Create(ctx context.Context, data entities.OrderData) (*ent
 	}
 
 	return &order, nil
+}
+
+func (r *PGOrderRepo) GetUserInventory(ctx context.Context, userId int) (*entities.UserInventory, error) {
+	stmt := psql.Select(
+		sm.Columns("i.codename", psql.Raw("count(o.id) as quantity")),
+		sm.From("orders").As("o"),
+		sm.InnerJoin("items").As("i").On(psql.Raw("o.item_id=i.id")),
+		sm.Where(psql.Quote("user_id").EQ(psql.Arg(userId))),
+		sm.GroupBy("item_id, i.codename"),
+	)
+	query, args := stmt.MustBuild(ctx)
+
+	rows, _ := r.db.Conn(ctx).Query(ctx, query, args...)
+
+	inventory, err := pgx.CollectRows(rows, pgx.RowToStructByName[entities.UserInventoryItem])
+	fmt.Println(inventory, err)
+
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, errs.ErrNotFound{Err: err}
+		}
+		r.logger.Error("Failed query user", "error", errs.ErrInternal{Err: err})
+		return nil, err
+	}
+
+	result := entities.UserInventory(inventory)
+	return &result, nil
 }

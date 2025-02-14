@@ -30,11 +30,14 @@ type UserRepo interface {
 
 type TransactionRepo interface {
 	GetUserBalance(ctx context.Context, userId int) (int, error)
+	GetIncomingForUser(ctx context.Context, userId int) (*entities.UserReceived, error)
+	GetOutgoingForUser(ctx context.Context, userId int) (*entities.UserSent, error)
 	Create(ctx context.Context, data entities.TransactionData) (*entities.Transaction, error)
 }
 
 type OrderRepo interface {
 	Create(ctx context.Context, data entities.OrderData) (*entities.Order, error)
+	GetUserInventory(ctx context.Context, userId int) (*entities.UserInventory, error)
 }
 
 type ItemRepo interface {

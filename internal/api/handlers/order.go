@@ -5,7 +5,6 @@ import (
 	"av-merch-shop/internal/errs"
 	"av-merch-shop/internal/usecase"
 	"errors"
-	"fmt"
 	"log/slog"
 	"net/http"
 
@@ -35,8 +34,6 @@ func (h *OrderHandler) PostOrder(c *gin.Context) {
 	}
 
 	itemParam := c.Param("item")
-
-	fmt.Println("ITEM", itemParam)
 
 	if itemParam == "" || itemParam == "/" {
 		c.JSON(http.StatusBadRequest, ErrorResponse{Error: "item is required"})

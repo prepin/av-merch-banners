@@ -19,6 +19,7 @@ type Handlers struct {
 	Credit *CreditHandler
 	Send   *SendCoinHandler
 	Order  *OrderHandler
+	Info   *InfoHandler
 }
 
 func NewHandlers(cfg *config.Config, usecases usecase.Usecases) *Handlers {
@@ -28,6 +29,7 @@ func NewHandlers(cfg *config.Config, usecases usecase.Usecases) *Handlers {
 		Credit: NewCreditHandler(cfg.Logger, usecases.CreditUseCase),
 		Send:   NewSendCoinHandler(cfg.Logger, usecases.SendCoinUseCase),
 		Order:  NewOrderHandler(cfg.Logger, usecases.OrderUseCase),
+		Info:   NewInfoHandler(cfg.Logger, usecases.InfoUseCase),
 	}
 }
 
@@ -69,6 +71,9 @@ func (h *Handlers) RegisterRoutes(r *gin.Engine, jwtService *auth.JWTService) {
 				// тоже покупка, но по GET, для совместимости
 				protected.GET("/buy/:item", h.Order.PostOrder)
 				protected.GET("/buy/", h.Order.PostOrder)
+
+				// Информация о текущем пользователе
+				protected.GET("/info", h.Info.GetInfo)
 			}
 
 			{ // роуты для пользователей с ролью админа,

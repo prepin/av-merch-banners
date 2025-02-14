@@ -2,9 +2,12 @@ package repository
 
 import (
 	"av-merch-shop/internal/entities"
+	"av-merch-shop/internal/errs"
 	"av-merch-shop/pkg/database"
 	"context"
 	"database/sql"
+	"errors"
+	"fmt"
 	"log/slog"
 
 	"github.com/jackc/pgx/v5"
@@ -99,4 +102,62 @@ func (r *PGTransactionRepo) Create(ctx context.Context, data entities.Transactio
 	})
 
 	return &transaction, err
+}
+
+func (r *PGTransactionRepo) GetOutgoingForUser(ctx context.Context, userId int) (*entities.UserSent, error) {
+	stmt := psql.Select(
+		sm.Columns("u.username", psql.Raw("abs(sum(t.amount)) as amount")),
+		sm.From("transactions").As("t"),
+		sm.InnerJoin("users").As("u").On(psql.Raw("t.counterparty_id=u.id")),
+		sm.Where(psql.Raw("t.user_id").EQ(psql.Arg(userId))),
+		sm.Where(psql.Raw("t.transaction_type").EQ(psql.Arg(entities.TransactionTransfer))),
+		sm.Where(psql.Raw("t.amount").LT(psql.Arg(0))),
+		sm.GroupBy("u.username"),
+	)
+	query, args := stmt.MustBuild(ctx)
+	fmt.Println(query, args)
+
+	rows, _ := r.db.Conn(ctx).Query(ctx, query, args...)
+
+	sent, err := pgx.CollectRows(rows, pgx.RowToStructByName[entities.UserSentItem])
+
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, errs.ErrNotFound{Err: err}
+		}
+		r.logger.Error("Failed query outgoing transaction list", "error", errs.ErrInternal{Err: err})
+		return nil, err
+	}
+
+	result := entities.UserSent(sent)
+	return &result, nil
+}
+
+func (r *PGTransactionRepo) GetIncomingForUser(ctx context.Context, userId int) (*entities.UserReceived, error) {
+	stmt := psql.Select(
+		sm.Columns("u.username", psql.Raw("sum(t.amount) as amount")),
+		sm.From("transactions").As("t"),
+		sm.InnerJoin("users").As("u").On(psql.Raw("t.counterparty_id=u.id")),
+		sm.Where(psql.Raw("t.user_id").EQ(psql.Arg(userId))),
+		sm.Where(psql.Raw("t.transaction_type").EQ(psql.Arg(entities.TransactionTransfer))),
+		sm.Where(psql.Raw("t.amount").GT(psql.Arg(0))),
+		sm.GroupBy("u.username"),
+	)
+	query, args := stmt.MustBuild(ctx)
+	fmt.Println(query, args)
+
+	rows, _ := r.db.Conn(ctx).Query(ctx, query, args...)
+
+	received, err := pgx.CollectRows(rows, pgx.RowToStructByName[entities.UserReceivedItem])
+
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, errs.ErrNotFound{Err: err}
+		}
+		r.logger.Error("Failed query incoming transaction list", "error", errs.ErrInternal{Err: err})
+		return nil, err
+	}
+
+	result := entities.UserReceived(received)
+	return &result, nil
 }

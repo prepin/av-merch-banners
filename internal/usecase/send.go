@@ -59,10 +59,11 @@ func (u *SendCoinUseCase) Send(ctx context.Context, data *entities.TransferData)
 		}
 
 		inTrData := entities.TransactionData{
-			UserID:         recipient.ID,
-			CounterpartyID: sender.ID,
-			Amount:         data.Amount,
-			ReferenceId:    ref,
+			UserID:          recipient.ID,
+			CounterpartyID:  sender.ID,
+			Amount:          data.Amount,
+			TransactionType: entities.TransactionTransfer,
+			ReferenceId:     ref,
 		}
 
 		_, err = u.transactionRepo.Create(ctx, outTrData)

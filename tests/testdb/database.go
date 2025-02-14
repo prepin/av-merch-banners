@@ -4,6 +4,8 @@ import (
 	"av-merch-shop/config"
 	"context"
 	"fmt"
+	"io"
+	"log"
 
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
@@ -25,7 +27,7 @@ func NewTestDatabase() (*TestDatabase, error) {
 	)
 
 	// убираем излишнее логирование, а то тест
-	// testcontainers.Logger = log.New(io.Discard, "", 0)
+	testcontainers.Logger = log.New(io.Discard, "", 0)
 
 	req := testcontainers.ContainerRequest{
 		Image:        "postgres:17",

@@ -20,6 +20,7 @@ make coverage
 ```
 * Запуск линтера
 ```
+go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 make lint
 ```
 ## Запуск приложения локально (для разработки)

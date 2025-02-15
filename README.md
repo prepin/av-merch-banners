@@ -141,7 +141,3 @@ goose postgres "postgres://prepin:@localhost:5432/av-merch-shop?sslmode=disable"
 ```
 goose postgres "postgres://prepin:@localhost:5432/av-merch-shop?sslmode=disable" -dir=schema/seed -no-versioning reset
 ```
-
-
-# Полезные файлы
-* [Человекочитаемая OpenAPI cхема](docs/redoc-static.html)

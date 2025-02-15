@@ -8,7 +8,7 @@ ifeq ($(DOCKER_COMPOSE),)
 $(error "docker-compose is not available. Please install Docker Compose")
 endif
 
-.PHONY: test-e2e test coverage build up up-visible down stop clean lint help dev-deps
+.PHONY: test-e2e test coverage build up up-visible down stop clean lint help dev-deps load-test
 
 test-e2e:
 	go test -v -count=1 -parallel=4 -coverpkg=av-merch-shop/internal/... -coverprofile=cov.out ./tests/e2e/...
@@ -16,6 +16,9 @@ test-e2e:
 test:
 	go test -v -count=1 -parallel=4 -coverpkg=av-merch-shop/internal/... -coverprofile=cov.out ./... ./tests/e2e/...
 	go tool cover -func=cov.out
+
+load-test:
+	scripts/load_test.sh
 
 coverage:
 	go tool cover -html=cov.out

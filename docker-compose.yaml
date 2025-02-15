@@ -46,9 +46,6 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=av-merch-shop
-    # volumes:
-    # "./migrations/init.sql" - путь к миграциям БД
-    # - ./migrations/init.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
       test: ["CMD-SHELL", "sh -c 'pg_isready -U postgres -d av-merch-shop'"]
       interval: 5s

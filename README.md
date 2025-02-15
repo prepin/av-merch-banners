@@ -39,6 +39,11 @@ go install github.com/pressly/goose/v3/cmd/goose@latest
 * Запуск сервера
 ```
 go run main.go
+## Нагрузочное тестирование
+Должны быть запущены контейнеры с приложением, установлены jq и oha.
+```
+make load-test
+```
 ```
 
 # Замечания по реализации

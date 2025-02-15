@@ -144,4 +144,4 @@ goose postgres "postgres://prepin:@localhost:5432/av-merch-shop?sslmode=disable"
 
 
 # Полезные файлы
-* [Человекочитаемая OpenAPI cхема](docs/redoc.static.html)
+* [Человекочитаемая OpenAPI cхема](docs/redoc-static.html)

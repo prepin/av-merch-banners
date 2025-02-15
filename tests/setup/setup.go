@@ -5,7 +5,9 @@ import (
 	"av-merch-shop/internal/app"
 	"av-merch-shop/pkg/auth"
 	"av-merch-shop/pkg/database"
+	"av-merch-shop/pkg/redis"
 	"av-merch-shop/tests/testdb"
+	"av-merch-shop/tests/testredis"
 	"log/slog"
 	"net/http"
 	"net/http/httptest"
@@ -34,6 +36,12 @@ func CreateTestEnv(t *testing.T) (env *TestEnv, cleanup, loadSeeds, dropSeeds fu
 		t.Fatalf("Failed to create test database: %v", err)
 	}
 
+	testRedis, err := testredis.NewTestRedis()
+	if err != nil {
+		testDB.TerminateDB()
+		t.Fatalf("Failed to create test redis: %v", err)
+	}
+
 	loadSeedData := func() {
 		if err := testDB.RunMigrations(); err != nil {
 			testDB.TerminateDB()
@@ -57,6 +65,7 @@ func CreateTestEnv(t *testing.T) (env *TestEnv, cleanup, loadSeeds, dropSeeds fu
 	cfg := &config.Config{
 		Logger: InitTestLogger(),
 		DB:     testDB.Config,
+		Redis:  testRedis.Config,
 		Server: config.ServerConfig{
 			Port:         ":0",
 			ReadTimeout:  5,
@@ -68,8 +77,9 @@ func CreateTestEnv(t *testing.T) (env *TestEnv, cleanup, loadSeeds, dropSeeds fu
 	}
 
 	db := database.NewDatabase(cfg.DB)
+	redis := redis.NewRedis(cfg.Redis, cfg.Logger)
 
-	application := app.New(cfg, db)
+	application := app.New(cfg, db, redis)
 
 	gin.SetMode(gin.TestMode)
 	router := gin.Default()

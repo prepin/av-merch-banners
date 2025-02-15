@@ -112,8 +112,7 @@ func (r *PGTransactionRepo) GetOutgoingForUser(ctx context.Context, userID int) 
 		sm.From("transactions").As("t"),
 		sm.InnerJoin("users").As("u").On(psql.Raw("t.counterparty_id=u.id")),
 		sm.Where(psql.Raw("t.user_id").EQ(psql.Arg(userID))),
-		sm.Where(psql.Raw("t.transaction_type").EQ(psql.Arg(entities.TransactionTransfer))),
-		sm.Where(psql.Raw("t.amount").LT(psql.Arg(0))),
+		sm.Where(psql.Raw("t.transaction_type").EQ(psql.Arg(entities.TransactionOutTransfer))),
 		sm.GroupBy("u.username"),
 	)
 	query, args := stmt.MustBuild(ctx)
@@ -144,8 +143,7 @@ func (r *PGTransactionRepo) GetIncomingForUser(ctx context.Context, userID int) 
 		sm.From("transactions").As("t"),
 		sm.InnerJoin("users").As("u").On(psql.Raw("t.counterparty_id=u.id")),
 		sm.Where(psql.Raw("t.user_id").EQ(psql.Arg(userID))),
-		sm.Where(psql.Raw("t.transaction_type").EQ(psql.Arg(entities.TransactionTransfer))),
-		sm.Where(psql.Raw("t.amount").GT(psql.Arg(0))),
+		sm.Where(psql.Raw("t.transaction_type").EQ(psql.Arg(entities.TransactionInTransfer))),
 		sm.GroupBy("u.username"),
 	)
 	query, args := stmt.MustBuild(ctx)

@@ -13,6 +13,7 @@ type orderUseCase struct {
 	userRepo           UserRepo
 	itemRepo           ItemRepo
 	orderRepo          OrderRepo
+	userInfoCache      UserInfoCache
 }
 
 type OrderUseCase interface {
@@ -25,6 +26,7 @@ func NewOrderUseCase(
 	ur UserRepo,
 	ir ItemRepo,
 	or OrderRepo,
+	uic UserInfoCache,
 ) OrderUseCase {
 	return &orderUseCase{
 		transactionManager: tm,
@@ -32,6 +34,7 @@ func NewOrderUseCase(
 		userRepo:           ur,
 		itemRepo:           ir,
 		orderRepo:          or,
+		userInfoCache:      uic,
 	}
 }
 
@@ -63,6 +66,8 @@ func (u *orderUseCase) Buy(ctx context.Context, data *entities.OrderRequest) err
 		if err != nil {
 			return err
 		}
+
+		u.userInfoCache.ExpireUserInfo(ctx, data.UserID)
 
 		return nil
 	})

@@ -3,6 +3,7 @@ package usecase
 import (
 	"av-merch-shop/internal/entities"
 	"context"
+	"time"
 )
 
 type Repos struct {
@@ -11,6 +12,7 @@ type Repos struct {
 	TransactionRepo    TransactionRepo
 	ItemRepo           ItemRepo
 	OrderRepo          OrderRepo
+	UserInfoCache      UserInfoCache
 }
 
 type Services struct {
@@ -44,6 +46,12 @@ type ItemRepo interface {
 	GetItemByName(ctx context.Context, itemName string) (*entities.Item, error)
 }
 
+type UserInfoCache interface {
+	GetUserInfo(ctx context.Context, userID int) (*entities.UserInfo, error)
+	SetUserInfo(ctx context.Context, userID int, info entities.UserInfo) error
+	ExpireUserInfo(ctx context.Context, userID int)
+}
+
 type TokenService interface {
 	GenerateToken(userID int, username string, role string) (string, error)
 }
@@ -51,4 +59,9 @@ type TokenService interface {
 type HashService interface {
 	HashPassword(password string) (string, error)
 	CompareWithPassword(hashed string, password string) bool
+}
+
+type CacheService interface {
+	Get(ctx context.Context, key string, dest any) error
+	Set(ctx context.Context, key string, value any, expiration time.Duration) error
 }

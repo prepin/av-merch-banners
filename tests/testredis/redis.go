@@ -1,4 +1,4 @@
-package testdb
+package testredis
 
 import (
 	"av-merch-shop/config"
@@ -11,35 +11,23 @@ import (
 	"github.com/testcontainers/testcontainers-go/wait"
 )
 
-type TestDatabase struct {
+type TestRedis struct {
 	container testcontainers.Container
-	Config    config.DBConfig
+	Config    config.RedisConfig
 	ctx       context.Context
 }
 
-func NewTestDatabase() (*TestDatabase, error) {
+func NewTestRedis() (*TestRedis, error) {
 	ctx := context.Background()
 
-	const (
-		dbUser     = "test"
-		dbPassword = "test"
-		dbName     = "testdb"
-	)
-
-	// Убираем излишнее логирование, а то тестовый вывод захламлён.
 	testcontainers.Logger = log.New(io.Discard, "", 0)
 
 	req := testcontainers.ContainerRequest{
-		Image:        "postgres:17",
-		ExposedPorts: []string{"5432/tcp"},
-		Env: map[string]string{
-			"POSTGRES_DB":       dbName,
-			"POSTGRES_USER":     dbUser,
-			"POSTGRES_PASSWORD": dbPassword,
-		},
+		Image:        "redis:7",
+		ExposedPorts: []string{"6379/tcp"},
 		WaitingFor: wait.ForAll(
-			wait.ForLog("database system is ready to accept connections"),
-			wait.ForListeningPort("5432/tcp"),
+			wait.ForLog("Ready to accept connections"),
+			wait.ForListeningPort("6379/tcp"),
 		),
 		AutoRemove: true,
 	}
@@ -60,7 +48,7 @@ func NewTestDatabase() (*TestDatabase, error) {
 		return nil, fmt.Errorf("failed to get container host: %w", err)
 	}
 
-	mappedPort, err := container.MappedPort(ctx, "5432")
+	mappedPort, err := container.MappedPort(ctx, "6379")
 	if err != nil {
 		if termErr := container.Terminate(ctx); termErr != nil {
 			return nil, fmt.Errorf("failed to get container port: %w, failed to terminate container: %w", err, termErr)
@@ -68,32 +56,22 @@ func NewTestDatabase() (*TestDatabase, error) {
 		return nil, fmt.Errorf("failed to get container port: %w", err)
 	}
 
-	dbConfig := config.DBConfig{
-		Host:     host,
-		Port:     mappedPort.Int(),
-		User:     dbUser,
-		Password: dbPassword,
-		DBName:   dbName,
+	redisConfig := config.RedisConfig{
+		Addr:     fmt.Sprintf("%s:%d", host, mappedPort.Int()),
+		Password: "",
+		DB:       0,
 	}
 
-	return &TestDatabase{
+	return &TestRedis{
 		container: container,
-		Config:    dbConfig,
+		Config:    redisConfig,
 		ctx:       ctx,
 	}, nil
 }
 
-func (td *TestDatabase) ConnectionString() string {
-	return td.Config.GetConnectionString()
-}
-
-func (td *TestDatabase) MigrateConnectionString() string {
-	return "postgresql://" + td.ConnectionString()[len("postgres://"):]
-}
-
-func (td *TestDatabase) TerminateDB() {
-	if td.container != nil {
-		if err := td.container.Terminate(td.ctx); err != nil {
+func (tr *TestRedis) TerminateRedis() {
+	if tr.container != nil {
+		if err := tr.container.Terminate(tr.ctx); err != nil {
 			log.Printf("failed to terminate container: %v", err)
 		}
 	}

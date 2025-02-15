@@ -12,17 +12,19 @@ type sendCoinUseCase struct {
 	transactionManager TransactionManager
 	transactionRepo    TransactionRepo
 	userRepo           UserRepo
+	userInfoCache      UserInfoCache
 }
 
 type SendCoinUseCase interface {
 	Send(ctx context.Context, data *entities.TransferData) error
 }
 
-func NewSendCoinUseCase(tm TransactionManager, tr TransactionRepo, ur UserRepo) SendCoinUseCase {
+func NewSendCoinUseCase(tm TransactionManager, tr TransactionRepo, ur UserRepo, uic UserInfoCache) SendCoinUseCase {
 	return &sendCoinUseCase{
 		transactionManager: tm,
 		transactionRepo:    tr,
 		userRepo:           ur,
+		userInfoCache:      uic,
 	}
 }
 
@@ -59,7 +61,7 @@ func (u *sendCoinUseCase) Send(ctx context.Context, data *entities.TransferData)
 			UserID:          sender.ID,
 			CounterpartyID:  recipient.ID,
 			Amount:          -data.Amount,
-			TransactionType: entities.TransactionTransfer,
+			TransactionType: entities.TransactionOutTransfer,
 			ReferenceID:     ref,
 		}
 
@@ -67,7 +69,7 @@ func (u *sendCoinUseCase) Send(ctx context.Context, data *entities.TransferData)
 			UserID:          recipient.ID,
 			CounterpartyID:  sender.ID,
 			Amount:          data.Amount,
-			TransactionType: entities.TransactionTransfer,
+			TransactionType: entities.TransactionInTransfer,
 			ReferenceID:     ref,
 		}
 
@@ -80,6 +82,9 @@ func (u *sendCoinUseCase) Send(ctx context.Context, data *entities.TransferData)
 		if err != nil {
 			return err
 		}
+
+		u.userInfoCache.ExpireUserInfo(ctx, outTrData.UserID)
+		u.userInfoCache.ExpireUserInfo(ctx, inTrData.UserID)
 
 		return nil
 	})

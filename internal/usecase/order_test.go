@@ -19,6 +19,7 @@ func TestBuy_Errors(t *testing.T) {
 		ur := new(MockUserRepo)
 		ir := new(MockItemRepo)
 		or := new(MockOrderRepo)
+		uic := new(MockUserInfoCache)
 
 		expectedErr := errors.New("db error")
 
@@ -31,8 +32,8 @@ func TestBuy_Errors(t *testing.T) {
 			}).
 			Return(expectedErr)
 
-		uc := NewOrderUseCase(tm, tr, ur, ir, or)
-		err := uc.Buy(ctx, &entities.OrderRequest{ItemName: "item1"})
+		uc := NewOrderUseCase(tm, tr, ur, ir, or, uic)
+		err := uc.Buy(ctx, &entities.OrderRequest{ItemName: "item1", UserID: 1})
 
 		assert.Error(t, err)
 		assert.Equal(t, expectedErr, err)
@@ -46,6 +47,7 @@ func TestBuy_Errors(t *testing.T) {
 		ur := new(MockUserRepo)
 		ir := new(MockItemRepo)
 		or := new(MockOrderRepo)
+		uic := new(MockUserInfoCache)
 
 		expectedErr := errors.New("transaction error")
 
@@ -65,8 +67,8 @@ func TestBuy_Errors(t *testing.T) {
 			}).
 			Return(expectedErr)
 
-		uc := NewOrderUseCase(tm, tr, ur, ir, or)
-		err := uc.Buy(ctx, &entities.OrderRequest{ItemName: "item1"})
+		uc := NewOrderUseCase(tm, tr, ur, ir, or, uic)
+		err := uc.Buy(ctx, &entities.OrderRequest{ItemName: "item1", UserID: 1})
 
 		assert.Error(t, err)
 		assert.Equal(t, expectedErr, err)
@@ -81,6 +83,7 @@ func TestBuy_Errors(t *testing.T) {
 		ur := new(MockUserRepo)
 		ir := new(MockItemRepo)
 		or := new(MockOrderRepo)
+		uic := new(MockUserInfoCache)
 
 		expectedErr := errors.New("order error")
 
@@ -107,8 +110,8 @@ func TestBuy_Errors(t *testing.T) {
 			}).
 			Return(expectedErr)
 
-		uc := NewOrderUseCase(tm, tr, ur, ir, or)
-		err := uc.Buy(ctx, &entities.OrderRequest{ItemName: "item1"})
+		uc := NewOrderUseCase(tm, tr, ur, ir, or, uic)
+		err := uc.Buy(ctx, &entities.OrderRequest{ItemName: "item1", UserID: 1})
 
 		assert.Error(t, err)
 		assert.Equal(t, expectedErr, err)

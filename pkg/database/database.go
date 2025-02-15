@@ -28,8 +28,8 @@ func NewDatabase(cfg config.DBConfig) *Database {
 		return nil
 	}
 
-	config.MaxConns = 25
-	config.MinConns = 5
+	config.MaxConns = 50
+	config.MinConns = 10
 	config.MaxConnLifetime = 5 * time.Minute
 	config.MaxConnIdleTime = 5 * time.Minute
 

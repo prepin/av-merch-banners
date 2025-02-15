@@ -9,9 +9,10 @@ import (
 type transactionType string
 
 const (
-	TransactionCredit   transactionType = "CREDIT"
-	TransactionTransfer transactionType = "TRANSFER"
-	TransactionOrder    transactionType = "ORDER"
+	TransactionCredit      transactionType = "CREDIT"
+	TransactionInTransfer  transactionType = "IN_TRANSFER"
+	TransactionOutTransfer transactionType = "OUT_TRANSFER"
+	TransactionOrder       transactionType = "ORDER"
 )
 
 type Transaction struct {

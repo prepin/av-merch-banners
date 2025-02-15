@@ -15,7 +15,7 @@ CREDIT_DATA='{"username":"employee","amount":100000}'
 TEST_DURATION="60s"
 REQUESTS_PER_SECOND=1000
 CONCURRENT_USERS=100
-WRITE_TO_FILE=true
+WRITE_TO_FILE=false
 
 RESULTS_DIR="docs/load_test_results"
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
@@ -82,6 +82,16 @@ fi
 
 echo "Director token retrieved successfully."
 
+echo -e "\nPerforming credit operation before test..."
+credit_response=$(curl -s -X POST \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer ${DIRECTOR_TOKEN}" \
+    -d "${CREDIT_DATA}" \
+    "${HOST}${CREDIT_ENDPOINT}")
+
+echo "Credit operation response: ${credit_response}"
+
+
 # Auth endpoint test
 run_oha_test "auth" oha -z "${TEST_DURATION}" \
     -c "${CONCURRENT_USERS}" \
@@ -94,14 +104,6 @@ run_oha_test "auth" oha -z "${TEST_DURATION}" \
     -d "${EMPLOYEE_AUTH}" \
     "${HOST}${AUTH_ENDPOINT}"
 
-echo -e "\nPerforming credit operation before sendCoin test..."
-credit_response=$(curl -s -X POST \
-    -H "Content-Type: application/json" \
-    -H "Authorization: Bearer ${DIRECTOR_TOKEN}" \
-    -d "${CREDIT_DATA}" \
-    "${HOST}${CREDIT_ENDPOINT}")
-
-echo "Credit operation response: ${credit_response}"
 
 # SendCoin endpoint test
 run_oha_test "sendcoin" oha -z "${TEST_DURATION}" \

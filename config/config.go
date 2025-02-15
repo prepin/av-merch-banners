@@ -13,6 +13,7 @@ type Config struct {
 	Server ServerConfig
 	Auth   AuthConfig
 	DB     DBConfig
+	Redis  RedisConfig
 }
 
 func Load() *Config {
@@ -32,6 +33,7 @@ func (c *Config) load() {
 	c.loadDBConfig()
 	c.loadAuthConfig()
 	c.loadServerConfig()
+	c.loadRedisConfig()
 }
 
 func getEnv(key, defaultValue string) string {

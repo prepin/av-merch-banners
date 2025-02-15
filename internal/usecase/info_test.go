@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 func TestGetInfo_AllErrors(t *testing.T) {
@@ -15,69 +16,18 @@ func TestGetInfo_AllErrors(t *testing.T) {
 		ur := new(MockUserRepo)
 		tr := new(MockTransactionRepo)
 		or := new(MockOrderRepo)
+		cache := new(MockUserInfoCache)
 
 		ur.On("GetByID", ctx, 1).Return(&entities.User{ID: 1}, nil)
 		expectedErr := errors.New("inventory error")
 		or.On("GetUserInventory", ctx, 1).Return(nil, expectedErr)
+		cache.On("GetUserInfo", ctx, 1).Return(nil, errors.New("cache miss"))
 
-		uc := NewInfoUseCase(ur, tr, or)
-		info, err := uc.GetInfo(ctx, 1)
-
-		assert.Error(t, err)
-		assert.Nil(t, info)
-		assert.Equal(t, expectedErr, err)
-	})
-
-	t.Run("get balance error", func(t *testing.T) {
-		ur := new(MockUserRepo)
-		tr := new(MockTransactionRepo)
-		or := new(MockOrderRepo)
-
-		ur.On("GetByID", ctx, 1).Return(&entities.User{ID: 1}, nil)
-		or.On("GetUserInventory", ctx, 1).Return(&entities.UserInventory{}, nil)
-		expectedErr := errors.New("balance error")
-		tr.On("GetUserBalance", ctx, 1).Return(0, expectedErr)
-
-		uc := NewInfoUseCase(ur, tr, or)
-		info, err := uc.GetInfo(ctx, 1)
-
-		assert.Error(t, err)
-		assert.Nil(t, info)
-		assert.Equal(t, expectedErr, err)
-	})
-
-	t.Run("get outgoing transactions error", func(t *testing.T) {
-		ur := new(MockUserRepo)
-		tr := new(MockTransactionRepo)
-		or := new(MockOrderRepo)
-
-		ur.On("GetByID", ctx, 1).Return(&entities.User{ID: 1}, nil)
-		or.On("GetUserInventory", ctx, 1).Return(&entities.UserInventory{}, nil)
-		tr.On("GetUserBalance", ctx, 1).Return(100, nil)
-		expectedErr := errors.New("outgoing error")
-		tr.On("GetOutgoingForUser", ctx, 1).Return(nil, expectedErr)
-
-		uc := NewInfoUseCase(ur, tr, or)
-		info, err := uc.GetInfo(ctx, 1)
-
-		assert.Error(t, err)
-		assert.Nil(t, info)
-		assert.Equal(t, expectedErr, err)
-	})
-
-	t.Run("get incoming transactions error", func(t *testing.T) {
-		ur := new(MockUserRepo)
-		tr := new(MockTransactionRepo)
-		or := new(MockOrderRepo)
-
-		ur.On("GetByID", ctx, 1).Return(&entities.User{ID: 1}, nil)
-		or.On("GetUserInventory", ctx, 1).Return(&entities.UserInventory{}, nil)
-		tr.On("GetUserBalance", ctx, 1).Return(100, nil)
+		tr.On("GetUserBalance", ctx, 1).Return(0, nil)
 		tr.On("GetOutgoingForUser", ctx, 1).Return(&entities.UserSent{}, nil)
-		expectedErr := errors.New("incoming error")
-		tr.On("GetIncomingForUser", ctx, 1).Return(nil, expectedErr)
+		tr.On("GetIncomingForUser", ctx, 1).Return(&entities.UserReceived{}, nil)
 
-		uc := NewInfoUseCase(ur, tr, or)
+		uc := NewInfoUseCase(ur, tr, or, cache)
 		info, err := uc.GetInfo(ctx, 1)
 
 		assert.Error(t, err)
@@ -85,20 +35,60 @@ func TestGetInfo_AllErrors(t *testing.T) {
 		assert.Equal(t, expectedErr, err)
 	})
 
-	t.Run("get user error", func(t *testing.T) {
+	t.Run("cache hit returns early", func(t *testing.T) {
 		ur := new(MockUserRepo)
 		tr := new(MockTransactionRepo)
 		or := new(MockOrderRepo)
+		cache := new(MockUserInfoCache)
 
-		expectedErr := errors.New("user not found")
-		ur.On("GetByID", ctx, 1).Return(nil, expectedErr)
+		cachedInfo := &entities.UserInfo{
+			Coins:     100,
+			Inventory: entities.UserInventory{},
+			CoinHistory: entities.UserCoinHistory{
+				Received: entities.UserReceived{},
+				Sent:     entities.UserSent{},
+			},
+		}
 
-		uc := NewInfoUseCase(ur, tr, or)
+		cache.On("GetUserInfo", ctx, 1).Return(cachedInfo, nil)
+
+		uc := NewInfoUseCase(ur, tr, or, cache)
 		info, err := uc.GetInfo(ctx, 1)
 
-		assert.Error(t, err)
-		assert.Nil(t, info)
-		assert.Equal(t, expectedErr, err)
-		ur.AssertExpectations(t)
+		assert.NoError(t, err)
+		assert.Equal(t, cachedInfo, info)
+
+		ur.AssertNotCalled(t, "GetByID")
+		tr.AssertNotCalled(t, "GetUserBalance")
+		or.AssertNotCalled(t, "GetUserInventory")
 	})
+
+}
+
+func TestGetInfo_Success(t *testing.T) {
+	ctx := t.Context()
+	ur := new(MockUserRepo)
+	tr := new(MockTransactionRepo)
+	or := new(MockOrderRepo)
+	cache := new(MockUserInfoCache)
+
+	user := &entities.User{ID: 1}
+	inventory := &entities.UserInventory{}
+	sent := &entities.UserSent{}
+	received := &entities.UserReceived{}
+
+	ur.On("GetByID", ctx, 1).Return(user, nil)
+	or.On("GetUserInventory", ctx, 1).Return(inventory, nil)
+	tr.On("GetUserBalance", ctx, 1).Return(100, nil)
+	tr.On("GetOutgoingForUser", ctx, 1).Return(sent, nil)
+	tr.On("GetIncomingForUser", ctx, 1).Return(received, nil)
+	cache.On("GetUserInfo", ctx, 1).Return(nil, errors.New("cache miss"))
+	cache.On("SetUserInfo", ctx, 1, mock.AnythingOfType("entities.UserInfo")).Return(nil)
+
+	uc := NewInfoUseCase(ur, tr, or, cache)
+	info, err := uc.GetInfo(ctx, 1)
+
+	assert.NoError(t, err)
+	assert.NotNil(t, info)
+	assert.Equal(t, 100, info.Coins)
 }

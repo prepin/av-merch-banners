@@ -134,3 +134,24 @@ func (m *MockHashService) CompareWithPassword(hashed, password string) bool {
 	args := m.Called(hashed, password)
 	return args.Bool(0)
 }
+
+type MockUserInfoCache struct {
+	mock.Mock
+}
+
+func (m *MockUserInfoCache) GetUserInfo(ctx context.Context, userID int) (*entities.UserInfo, error) {
+	args := m.Called(ctx, userID)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*entities.UserInfo), args.Error(1)
+}
+
+func (m *MockUserInfoCache) SetUserInfo(ctx context.Context, userID int, info entities.UserInfo) error {
+	args := m.Called(ctx, userID, info)
+	return args.Error(0)
+}
+
+func (m *MockUserInfoCache) ExpireUserInfo(ctx context.Context, userID int) {
+	m.Called(ctx, userID)
+}

@@ -11,17 +11,19 @@ type creditUseCase struct {
 	transactionManager TransactionManager
 	transactionRepo    TransactionRepo
 	userRepo           UserRepo
+	userInfoCache      UserInfoCache
 }
 
 type CreditUseCase interface {
 	Credit(ctx context.Context, data *entities.CreditData) (*entities.CreditTransactionResult, error)
 }
 
-func NewCreditUseCase(tm TransactionManager, tr TransactionRepo, ur UserRepo) CreditUseCase {
+func NewCreditUseCase(tm TransactionManager, tr TransactionRepo, ur UserRepo, uic UserInfoCache) CreditUseCase {
 	return &creditUseCase{
 		transactionManager: tm,
 		transactionRepo:    tr,
 		userRepo:           ur,
+		userInfoCache:      uic,
 	}
 }
 
@@ -65,6 +67,8 @@ func (u *creditUseCase) Credit(
 		if err != nil {
 			return err
 		}
+
+		u.userInfoCache.ExpireUserInfo(ctx, user.ID)
 
 		return nil
 	})

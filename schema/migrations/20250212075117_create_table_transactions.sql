@@ -12,6 +12,8 @@ CREATE TABLE IF NOT EXISTS transactions (
 
 CREATE INDEX idx_transactions_counterparty_id ON transactions (counterparty_id);
 
+CREATE INDEX idx_transactions_user_type ON transactions (user_id, transaction_type);
+
 -- +goose StatementEnd
 -- +goose Down
 -- +goose StatementBegin

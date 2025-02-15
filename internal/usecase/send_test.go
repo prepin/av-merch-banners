@@ -18,8 +18,9 @@ func TestSend_Errors(t *testing.T) {
 		tm := new(MockTransactionManager)
 		tr := new(MockTransactionRepo)
 		ur := new(MockUserRepo)
+		uic := new(MockUserInfoCache)
 
-		uc := NewSendCoinUseCase(tm, tr, ur)
+		uc := NewSendCoinUseCase(tm, tr, ur, uic)
 		err := uc.Send(ctx, &entities.TransferData{Amount: -1})
 
 		assert.ErrorIs(t, err, errs.ErrIncorrectAmountError)
@@ -29,6 +30,7 @@ func TestSend_Errors(t *testing.T) {
 		tm := new(MockTransactionManager)
 		tr := new(MockTransactionRepo)
 		ur := new(MockUserRepo)
+		uic := new(MockUserInfoCache)
 
 		ur.On("GetByID", ctx, 1).Return(&entities.User{ID: 1}, nil)
 		ur.On("GetByUsername", ctx, "recipient").Return(&entities.User{ID: 2}, nil)
@@ -41,7 +43,7 @@ func TestSend_Errors(t *testing.T) {
 			}).
 			Return(errs.ErrInsufficientFundsError)
 
-		uc := NewSendCoinUseCase(tm, tr, ur)
+		uc := NewSendCoinUseCase(tm, tr, ur, uic)
 		err := uc.Send(ctx, &entities.TransferData{
 			SenderID:  1,
 			Recipient: "recipient",
@@ -58,6 +60,7 @@ func TestSend_Errors(t *testing.T) {
 		tm := new(MockTransactionManager)
 		tr := new(MockTransactionRepo)
 		ur := new(MockUserRepo)
+		uic := new(MockUserInfoCache)
 
 		expectedErr := errors.New("sender error")
 		ur.On("GetByID", ctx, 1).Return(nil, expectedErr)
@@ -69,7 +72,7 @@ func TestSend_Errors(t *testing.T) {
 			}).
 			Return(expectedErr)
 
-		uc := NewSendCoinUseCase(tm, tr, ur)
+		uc := NewSendCoinUseCase(tm, tr, ur, uic)
 		err := uc.Send(ctx, &entities.TransferData{
 			SenderID:  1,
 			Recipient: "recipient",
@@ -85,6 +88,7 @@ func TestSend_Errors(t *testing.T) {
 		tm := new(MockTransactionManager)
 		tr := new(MockTransactionRepo)
 		ur := new(MockUserRepo)
+		uic := new(MockUserInfoCache)
 
 		ur.On("GetByID", ctx, 1).Return(&entities.User{ID: 1}, nil)
 		expectedErr := errors.New("recipient error")
@@ -97,7 +101,7 @@ func TestSend_Errors(t *testing.T) {
 			}).
 			Return(expectedErr)
 
-		uc := NewSendCoinUseCase(tm, tr, ur)
+		uc := NewSendCoinUseCase(tm, tr, ur, uic)
 		err := uc.Send(ctx, &entities.TransferData{
 			SenderID:  1,
 			Recipient: "recipient",
@@ -113,6 +117,7 @@ func TestSend_Errors(t *testing.T) {
 		tm := new(MockTransactionManager)
 		tr := new(MockTransactionRepo)
 		ur := new(MockUserRepo)
+		uic := new(MockUserInfoCache)
 
 		ur.On("GetByID", ctx, 1).Return(&entities.User{ID: 1}, nil)
 		ur.On("GetByUsername", ctx, "recipient").Return(&entities.User{ID: 2}, nil)
@@ -126,7 +131,7 @@ func TestSend_Errors(t *testing.T) {
 			}).
 			Return(expectedErr)
 
-		uc := NewSendCoinUseCase(tm, tr, ur)
+		uc := NewSendCoinUseCase(tm, tr, ur, uic)
 		err := uc.Send(ctx, &entities.TransferData{
 			SenderID:  1,
 			Recipient: "recipient",
@@ -143,6 +148,7 @@ func TestSend_Errors(t *testing.T) {
 		tm := new(MockTransactionManager)
 		tr := new(MockTransactionRepo)
 		ur := new(MockUserRepo)
+		uic := new(MockUserInfoCache)
 
 		ur.On("GetByID", ctx, 1).Return(&entities.User{ID: 1}, nil)
 		ur.On("GetByUsername", ctx, "recipient").Return(&entities.User{ID: 2}, nil)
@@ -159,7 +165,7 @@ func TestSend_Errors(t *testing.T) {
 			}).
 			Return(expectedErr)
 
-		uc := NewSendCoinUseCase(tm, tr, ur)
+		uc := NewSendCoinUseCase(tm, tr, ur, uic)
 		err := uc.Send(ctx, &entities.TransferData{
 			SenderID:  1,
 			Recipient: "recipient",
@@ -177,6 +183,7 @@ func TestSend_CreateSecondTransactionError(t *testing.T) {
 	tm := new(MockTransactionManager)
 	tr := new(MockTransactionRepo)
 	ur := new(MockUserRepo)
+	uic := new(MockUserInfoCache)
 
 	sender := &entities.User{ID: 1}
 	recipient := &entities.User{ID: 2, Username: "recipient"}
@@ -201,7 +208,7 @@ func TestSend_CreateSecondTransactionError(t *testing.T) {
 		}).
 		Return(expectedErr)
 
-	uc := NewSendCoinUseCase(tm, tr, ur)
+	uc := NewSendCoinUseCase(tm, tr, ur, uic)
 	err := uc.Send(ctx, &entities.TransferData{
 		SenderID:  sender.ID,
 		Recipient: recipient.Username,

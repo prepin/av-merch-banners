@@ -43,5 +43,4 @@ func (h *InfoHandler) GetInfo(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, info)
-
 }

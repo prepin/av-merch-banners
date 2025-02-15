@@ -39,16 +39,19 @@ func CreateTestEnv(t *testing.T) (env *TestEnv, cleanup, loadSeeds, dropSeeds fu
 	testRedis, err := testredis.NewTestRedis()
 	if err != nil {
 		testDB.TerminateDB()
+		testRedis.TerminateRedis()
 		t.Fatalf("Failed to create test redis: %v", err)
 	}
 
 	loadSeedData := func() {
 		if err := testDB.RunMigrations(); err != nil {
 			testDB.TerminateDB()
+			testRedis.TerminateRedis()
 			t.Fatalf("Failed to run migrations: %v", err)
 		}
 		if err := testDB.LoadFixtures(); err != nil {
 			testDB.TerminateDB()
+			testRedis.TerminateRedis()
 			t.Fatalf("Failed to load fixtures %v", err)
 		}
 	}
@@ -56,6 +59,7 @@ func CreateTestEnv(t *testing.T) (env *TestEnv, cleanup, loadSeeds, dropSeeds fu
 	dropSeedData := func() {
 		if err := testDB.CleanDatabase(); err != nil {
 			testDB.TerminateDB()
+			testRedis.TerminateRedis()
 			t.Fatalf("Failed to clean database: %v", err)
 		}
 	}
@@ -101,7 +105,6 @@ func CreateTestEnv(t *testing.T) (env *TestEnv, cleanup, loadSeeds, dropSeeds fu
 	cleanup = func() {
 		testServer.Close()
 		db.Close()
-		testDB.TerminateDB()
 	}
 
 	return env, cleanup, loadSeedData, dropSeedData

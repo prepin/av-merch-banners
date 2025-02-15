@@ -75,4 +75,5 @@ func (tr *TestRedis) TerminateRedis() {
 			log.Printf("failed to terminate container: %v", err)
 		}
 	}
+
 }

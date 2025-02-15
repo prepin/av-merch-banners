@@ -12,6 +12,9 @@ services:
       - AV_DB_PASSWORD=password
       - AV_DB_NAME=av-merch-shop
       - AV_SECRET=totally-secret-key
+      - AV_REDIS_ADDR=redis:6379
+      - AV_REDIS_PASSWORD=password
+      - AV_REDIS_DB=0
       - AV_SERVER_PORT=:8080
       - AV_SERVER_READ_TIMEOUT=1
       - AV_SERVER_WRITE_TIMEOUT=2
@@ -20,6 +23,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      redis:
+        condition: service_started
       migrations:
         condition: service_completed_successfully
     networks:
@@ -38,6 +43,15 @@ services:
     networks:
       - internal
 
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis-data:/data
+    command: redis-server --requirepass password
+    restart: always
+    networks:
+      - internal
+
   db:
     image: postgres:17
     container_name: postgres
@@ -46,6 +60,8 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=av-merch-shop
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "sh -c 'pg_isready -U postgres -d av-merch-shop'"]
       interval: 5s
@@ -54,5 +70,10 @@ services:
       start_period: 10s
     networks:
       - internal
+
 networks:
   internal:
+
+volumes:
+  postgres-data:
+  redis-data:
